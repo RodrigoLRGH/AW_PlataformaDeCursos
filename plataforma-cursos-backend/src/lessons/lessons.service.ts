@@ -12,7 +12,7 @@ export class LessonsService {
   constructor(
     @InjectRepository(Lesson) private readonly lessonRepo: Repository<Lesson>,
     @InjectRepository(Course) private readonly courseRepo: Repository<Course>,
-  ) {}
+  ) { }
 
   // Deuelve todas las lecciones de un curso ordenadas por su campo 'order'
   async findByCourse(courseId: number) {
@@ -33,10 +33,13 @@ export class LessonsService {
   // Crea una leccion en un curso. Solo el creador del curso puede agregar lecciones
   // Lanza ForbiddenException si el usuario no es el creador del curso
   async create(courseId: number, dto: CreateLessonDto, userId: number) {
-    const course = await this.courseRepo.findOne({ where: { id: courseId } });
-    if (!course) throw new NotFoundException('Curso no encontrado');
-    if (course.creatorId !== userId)
-      throw new ForbiddenException('No autorizado');
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    console.log('course.creatorId:', course?.creatorId, typeof course?.creatorId)
+    console.log('userId:', userId, typeof userId)
+    if (!course) throw new NotFoundException('Curso no encontrado')
+    if (Number(course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado')
+    }
 
     const lesson = this.lessonRepo.create({ ...dto, courseId });
     return this.lessonRepo.save(lesson);
@@ -50,7 +53,7 @@ export class LessonsService {
 
   // Elimina una lección por su ID
   async remove(id: string) {
-    return await this.lessonRepo.delete( { id} );
+    return await this.lessonRepo.delete({ id });
   }
-  
+
 }

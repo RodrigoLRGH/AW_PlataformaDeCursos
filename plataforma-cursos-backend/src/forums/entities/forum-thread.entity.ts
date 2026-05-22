@@ -1,14 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
-  JoinColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
 import { ForumReply } from './forum-reply.entity';
@@ -30,7 +20,7 @@ export class ForumThread {
   courseId: string;
 
   @Column({ name: 'author_id' })
-  authorId: string;
+  authorId: number;
 
   @Column({ name: 'is_pinned', default: false })
   isPinned: boolean;

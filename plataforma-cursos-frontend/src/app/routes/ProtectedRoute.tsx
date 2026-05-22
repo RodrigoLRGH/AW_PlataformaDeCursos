@@ -8,7 +8,9 @@ interface Props {
 }
 
 function ProtectedRoute({ children, allowedRoles }: Props) {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, isLoading } = useAuth();
+
+    if (isLoading) return <p className="text-center py-12 text-muted-foreground">Cargando...</p>;
 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;

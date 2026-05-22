@@ -1,14 +1,11 @@
-﻿import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+﻿import { Injectable, NotFoundException, ForbiddenException, } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Certificate } from './entities/certificate.entity';
 import { Enrollment } from '../enrollments/entities/enrollment.entity';
 import { randomUUID } from 'crypto';
-import * as PDFDocument from 'pdfkit';
+
+const PDFDocument = require('pdfkit');
 
 @Injectable()
 export class CertificatesService {
@@ -16,11 +13,11 @@ export class CertificatesService {
     @InjectRepository(Certificate) private certRepo: Repository<Certificate>,
     @InjectRepository(Enrollment)
     private enrollmentRepo: Repository<Enrollment>,
-  ) {}
+  ) { }
 
+  // Generar certificado al completar un curso
   async generate(userId: number, courseId: number) {
     const enrollment = await this.enrollmentRepo.findOne({
-      // Forzamos que los IDs sean tratados según el tipo de la entidad (number)
       where: { userId: Number(userId), courseId: Number(courseId) } as any,
       relations: ['course', 'user'],
     });
@@ -28,8 +25,6 @@ export class CertificatesService {
     if (!enrollment)
       throw new NotFoundException('No estás inscrito en este curso');
 
-    // REPARACIÓN: Si usas completedAt en la entidad, cámbialo aquí
-    // Si usas el booleano 'completed', asegúrate de que exista en la entidad Enrollment
     if (!enrollment.completedAt && !(enrollment as any).completed)
       throw new ForbiddenException(
         'Debes completar el curso antes de obtener el certificado',
@@ -50,6 +45,7 @@ export class CertificatesService {
     return this.certRepo.save(cert);
   }
 
+  // Obtener mis certificados
   async getMyCertificates(userId: number) {
     return this.certRepo.find({
       where: { userId: Number(userId) } as any,
@@ -57,21 +53,21 @@ export class CertificatesService {
     });
   }
 
-  async downloadPdf(certId: number, userId: number): Promise<Buffer> {
+
+  // Descargar certificado en PDF, verifica que el certificado exista y que el usuario sea el dueño antes de generar el PDF
+  async downloadPdf(certId: string, userId: number): Promise<Buffer> {
     const cert = await this.certRepo.findOne({
-      where: { id: Number(certId) } as any,
+      where: { id: certId },
       relations: ['user', 'course'],
     });
 
     if (!cert) throw new NotFoundException('Certificado no encontrado');
 
-    // REPARACIÓN: Comparación segura de tipos
     if (Number(cert.userId) !== Number(userId)) {
       throw new ForbiddenException('No autorizado');
     }
 
     return new Promise((resolve, reject) => {
-      // PDFKit usa una estructura de flujo (stream)
       const doc = new PDFDocument({ size: 'A4', layout: 'landscape' });
       const buffers: Buffer[] = [];
 
@@ -79,7 +75,6 @@ export class CertificatesService {
       doc.on('end', () => resolve(Buffer.concat(buffers)));
       doc.on('error', (err) => reject(err));
 
-      // --- Diseño del certificado ---
       doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f8f4e8');
 
       doc
@@ -102,7 +97,7 @@ export class CertificatesService {
         .fontSize(28)
         .font('Helvetica-Bold')
         .fillColor('#1a472a')
-        .text(cert.user?.name || 'Estudiante', 0, 220, { align: 'center' });
+        .text(`${cert.user?.firstName || ''} ${cert.user?.lastName || ''}`.trim() || 'Estudiante', 0, 220, { align: 'center' })
 
       doc
         .fontSize(16)
@@ -117,7 +112,6 @@ export class CertificatesService {
         .font('Helvetica-Bold')
         .text(cert.course?.title || 'Curso', 0, 320, { align: 'center' });
 
-      // REPARACIÓN: Uso de Template Strings para evitar errores de caracteres inválidos
       doc
         .fontSize(12)
         .font('Helvetica')

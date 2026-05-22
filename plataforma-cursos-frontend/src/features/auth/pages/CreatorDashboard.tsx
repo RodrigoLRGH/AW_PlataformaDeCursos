@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useMyCourses } from '@/features/courses/hooks/useCourses.hook'
+import { CircleUser } from 'lucide-react'
 
 function CreatorDashboard() {
   const { user, logout } = useAuth()
@@ -23,8 +24,11 @@ function CreatorDashboard() {
       <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold text-primary">Panel del creador</h1>
         <div className="flex items-center gap-4">
+          <CircleUser />
           <span className="text-sm text-muted-foreground">{user?.firstName} {user?.lastName}</span>
-          <Button variant="ghost" size="sm" onClick={logout}>Cerrar sesión</Button>
+          <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+            Cerrar sesión
+          </Button>
         </div>
       </nav>
       <div className="max-w-5xl mx-auto px-8 py-10">
@@ -33,7 +37,7 @@ function CreatorDashboard() {
             <h2 className="text-2xl font-bold">Mis cursos</h2>
             <p className="text-muted-foreground">Gestiona tus cursos publicados y borradores</p>
           </div>
-          <Button onClick={() => navigate('/creator/courses/new')}>
+          <Button onClick={() => navigate('/creator/courses/new')} className="hover:cursor-pointer">
             + Nuevo curso
           </Button>
         </div>
@@ -43,7 +47,9 @@ function CreatorDashboard() {
           <Card>
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground mb-4">No tienes cursos todavía.</p>
-              <Button onClick={() => navigate('/creator/courses/new')}>Crear mi primer curso</Button>
+              <Button onClick={() => navigate('/creator/courses/new')} className="hover:cursor-pointer">
+                Crear mi primer curso
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -54,7 +60,7 @@ function CreatorDashboard() {
                   <div className="flex items-center gap-3">
                     <div>
                       <CardTitle className="text-lg">{course.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1">{course.description || 'Sin descripción'}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{course.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

@@ -1,13 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-  Unique,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Lesson } from '../../lessons/entities/lesson.entity';
 
@@ -18,12 +9,11 @@ export class Progress {
   id: string;
 
   @Column({ name: 'lesson_id' })
-  lessonId: number;
+  lessonId: string;
 
   @Column({ name: 'user_id' })
   userId: number;
 
-  // AGREGA ESTO: Para que el service pueda hacer progress.completed = true
   @Column({ default: false })
   completed: boolean;
 
@@ -33,7 +23,7 @@ export class Progress {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // Relations
+  // Relaciones
   @ManyToOne(() => Lesson, (lesson) => lesson.progressRecords, {
     onDelete: 'CASCADE',
   })

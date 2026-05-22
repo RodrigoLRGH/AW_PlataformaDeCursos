@@ -12,7 +12,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule,
-    JwtModule.register({}), // vacío — cada signAsync recibe su propio secret
+    JwtModule.register({}),
   ],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],

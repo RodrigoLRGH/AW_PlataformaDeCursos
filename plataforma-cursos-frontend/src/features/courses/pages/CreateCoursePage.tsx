@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/app/providers/AuthContext';
 
 
 const schema = z.object({
@@ -24,7 +25,7 @@ type CreateCourseFormData = z.infer<typeof schema>;
 
 export function CreateCoursePage() {
     const navigate = useNavigate();
-
+    const { logout } = useAuth();
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, setError } = useForm<CreateCourseFormData>({
         resolver: zodResolver(schema),
     });
@@ -42,9 +43,12 @@ export function CreateCoursePage() {
         <>
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold text-primary">Nuevo curso</h1>
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/creator-dashboard')}>
+                    <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
                         ← Volver
+                    </Button>
+                    <h1 className="text-xl font-bold text-primary">Nuevo curso</h1>
+                    <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+                        Cerrar sesión
                     </Button>
                 </nav>
                 <div className="max-w-2xl mx-auto px-8 py-10">
@@ -93,10 +97,10 @@ export function CreateCoursePage() {
                                     {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
                                 </div>
                                 <div className="flex gap-3 pt-2">
-                                    <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                                    <Button type="submit" className="flex-1 hover:cursor-pointer" disabled={isSubmitting} >
                                         {isSubmitting ? 'Guardando...' : 'Crear curso'}
                                     </Button>
-                                    <Button type="button" variant="outline" className="flex-1"
+                                    <Button type="button" variant="outline" className="flex-1 hover:cursor-pointer"
                                         onClick={() => navigate('/creator-dashboard')}>
                                         Cancelar
                                     </Button>

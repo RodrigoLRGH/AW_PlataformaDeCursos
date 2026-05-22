@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuard
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
@@ -30,21 +30,21 @@ export class LessonsController {
 
   // POST /courses/:courseId/lessons - Crear lección (solo para creadores del curso)
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear lección' })
   create(
     @Param('courseId', ParseIntPipe) courseId: number,
     @Body() dto: CreateLessonDto,
-    @Request() req: { user : { id: number } },
+    @Request() req,
   ) {
-    return this.lessonsService.create(courseId, dto, req.user.id);
+    return this.lessonsService.create(courseId, dto, req.user.sub)
   }
 
   // PUT /courses/:courseId/lessons/:id - Actualizar lección (solo para creadores del curso)
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar lección' })
@@ -57,7 +57,7 @@ export class LessonsController {
 
   // DELETE /courses/:courseId/lessons/:id - Eliminar lección (solo para creadores del curso)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar lección' })

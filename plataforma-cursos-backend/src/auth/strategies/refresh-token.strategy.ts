@@ -4,6 +4,8 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Request } from 'express';
 import { JwtPayload } from '../types/jwt-payload.type';
 
+// Estrategia para validar el token de refresco (Refresh Token)
+// Esta estrategia se encarga de extraer el token de refresco de las cookies o del header Authorization
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     constructor() {

@@ -3,14 +3,14 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { ExamsService } from './exams.service';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { SubmitExamDto } from './dto/submit-exam.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 
 // Gestiona la creacion, consulta y envio de examenes por curso
 @ApiTags('Exams')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 @Controller('exams')
 export class ExamsController {
@@ -27,9 +27,17 @@ export class ExamsController {
   create(
     @Param('courseId', ParseIntPipe) courseId: number,
     @Body() dto: CreateExamDto,
-    @Request() req: { user: { id: number } },
+    @Request() req,
   ) {
-    return this.examsService.create(courseId, dto, req.user.id);
+    return this.examsService.create(courseId, dto, req.user.sub);
+  }
+
+  // GET /exams/courses/:courseId
+  // Devuelve el examen de un curso
+  @Get('courses/:courseId')
+  @ApiOperation({ summary: 'Exámen de un curso' })
+  findByCourse(@Param('courseId', ParseIntPipe) courseId: number) {
+    return this.examsService.findByCourse(courseId);
   }
 
   // GET /exams/:id/questions
@@ -48,9 +56,9 @@ export class ExamsController {
   submit(
     @Param('id') id: string,
     @Body() dto: SubmitExamDto,
-    @Request() req: { user: { id: number } },
+    @Request() req,
   ) {
-    return this.examsService.submit(id, req.user.id, dto);
+    return this.examsService.submit(id, req.user.sub, dto);
   }
 
   // GET /exams/:id/results
@@ -58,14 +66,6 @@ export class ExamsController {
   @Get(':id/results')
   @ApiOperation({ summary: 'Mis resultados de un examen' })
   getResults(@Param('id') id: string, @Request() req) {
-    return this.examsService.getMyResults(req.user.id, id);
-  }
-
-  // GET /exams/courses/:courseId
-  // Devuelve el examen de un curso
-  @Get('courses/:courseId')
-  @ApiOperation({ summary: 'Exámen de un curso' })
-  findByCourse(@Param('courseId', ParseIntPipe) courseId: number) {
-    return this.examsService.findByCourse(courseId);
+    return this.examsService.getMyResults(req.user.sub, id);
   }
 }

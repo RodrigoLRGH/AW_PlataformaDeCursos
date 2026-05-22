@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
@@ -26,12 +26,12 @@ export class CoursesController {
   // GET /courses/my 
   // Devuelve los cursos creados por el creador autenticado, con sus lecciones
   @Get('my')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mis cursos (creator)' })
-  findMy(@Request() req: { user: { id: number } }) {
-    return this.coursesService.findByCreator(req.user.id);
+  findMy(@Request() req) {
+    return this.coursesService.findByCreator(req.user.sub);
   }
 
   // GET /courses/:id
@@ -46,38 +46,38 @@ export class CoursesController {
   // POST /courses
   // Crea un curso, solo para usuarios con rol CREATOR
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Crear curso' })
   @ApiResponse({ status: 201, description: 'Curso creado exitosamente.' })
-  create(@Body() dto: CreateCourseDto, @Request() req: { user: { id: number } }) {
-    return this.coursesService.create(dto, req.user.id);
+  create(@Body() dto: CreateCourseDto, @Request() req) {
+    return this.coursesService.create(dto, req.user.sub);
   }
 
   // PUT /courses/:id
   // Actualiza un curso. Solo el creador del curso puede modificarlo
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar curso' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateCourseDto,
-    @Request() req: { user: { id: number } },
+    @Request() req,
   ) {
-    return this.coursesService.update(id, dto, req.user.id);
+    return this.coursesService.update(id, dto, req.user.sub);
   }
 
   // DELETE /courses/:id
   // Elimina un curso. Solo el creador del curso puede eliminarlo
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar curso' })
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req: { user: { id: number } }) {
-    return this.coursesService.remove(id, req.user.id);
+  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
+    return this.coursesService.remove(id, req.user.sub);
   }
 }

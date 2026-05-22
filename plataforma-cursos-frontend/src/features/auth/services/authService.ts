@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../../../shared/utils/axiosInstance';
 
 export interface LoginPayload { email: string; password: string; }
 export interface RegisterPayload {
@@ -10,23 +8,22 @@ export interface RegisterPayload {
 }
 
 export const authService = {
-    login: async (payload: LoginPayload) => {
-        const res = await axios.post(`${API_URL}/auth/login`, payload, { withCredentials: true });
-        return res.data; // { user }
+    login: async (data: LoginPayload) => {
+        const response = await api.post('/auth/login', data)
+        return response.data
     },
-    register: async (payload: RegisterPayload) => {
-        const res = await axios.post(`${API_URL}/auth/register`, payload, { withCredentials: true });
-        return res.data;
+    register: async (data: RegisterPayload) => {
+        const response = await api.post('/auth/register', data)
+        return response.data
     },
     logout: async () => {
-        await axios.post(`${API_URL}/auth/logout`, {}, { withCredentials: true });
-    },
-    refresh: async () => {
-        const res = await axios.post(`${API_URL}/auth/refresh`, {}, { withCredentials: true });
-        return res.data;
+        try {
+            await api.post('/auth/logout')
+        } catch {
+        }
     },
     me: async () => {
-        const res = await axios.get(`${API_URL}/auth/me`, { withCredentials: true });
-        return res.data;
+        const response = await api.get('/auth/me')
+        return response.data
     },
-};
+}

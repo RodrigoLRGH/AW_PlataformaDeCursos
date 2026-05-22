@@ -95,7 +95,7 @@ function RegisterPage() {
                             </Select>
                         </div>
                         {errors.root && <p className="text-destructive text-sm text-center">{errors.root.message}</p>}
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        <Button type="submit" className="w-full hover:cursor-pointer" disabled={isSubmitting}>
                             {isSubmitting ? 'Registrando...' : 'Registrarse'}
                         </Button>
                     </form>

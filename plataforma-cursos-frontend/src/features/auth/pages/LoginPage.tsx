@@ -29,7 +29,7 @@ function LoginPage() {
     const onSubmit = async (data: LoginForm) => {
         try {
             const response = await authService.login(data);
-            login(response.user); // ✅ solo el user
+            login(response.user);
             navigate(response.user.role === 'creator' ? '/creator-dashboard' : '/student-dashboard');
         } catch {
             setError('email', { type: 'manual', message: 'Credenciales inválidas' });
@@ -56,7 +56,7 @@ function LoginPage() {
                                 {errors.password && <p className="text-destructive text-sm">{errors.password.message}</p>}
                             </div>
                             {errors.root && <p className="text-destructive text-sm text-center">{errors.root.message}</p>}
-                            <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            <Button type="submit" className="w-full hover:cursor-pointer" disabled={isSubmitting}>
                                 {isSubmitting ? 'Cargando...' : 'Entrar'}
                             </Button>
                         </form>

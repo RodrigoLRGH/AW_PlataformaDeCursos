@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, type ReactNode, useContext } from '
 import { authService } from '@/features/auth/services/authService';
 
 interface User {
-  id: number; // ✅ number, no string — así viene del backend
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -11,7 +11,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (user: User) => void;  // ✅ sin token — va en cookie
+  login: (user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -21,10 +21,9 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ evita flash de login
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Al recargar la página, verifica si hay sesión activa via cookie
     authService.me()
       .then(setUser)
       .catch(() => setUser(null))
@@ -33,13 +32,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (user: User) => {
     setUser(user);
-    // ✅ sin localStorage — la cookie httpOnly persiste sola
+
   };
 
   const logout = async () => {
-    await authService.logout(); // limpia cookies en el servidor
-    setUser(null);
-  };
+    try {
+      await authService.logout()
+    } catch {
+    }
+    setUser(null)
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, isLoading }}>

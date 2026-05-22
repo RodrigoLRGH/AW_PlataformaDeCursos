@@ -5,13 +5,15 @@ import CourseCard from '../components/CourseCard'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useNavigate } from 'react-router'
 
 function CourseCatalog() {
     const { logout } = useAuth()
     const { courses, loading, error } = useCourses(true)
     const [search, setSearch] = useState('')
-    const [category, setCategory] = useState('')
+    const [category] = useState('')
     const [level, setLevel] = useState('')
+    const navigate = useNavigate()
 
     const filteredCourses = courses.filter(course => {
         if (!course) return false
@@ -24,8 +26,13 @@ function CourseCatalog() {
     return (
         <div className="min-h-screen bg-muted/40">
             <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
+                <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
+                    ← Volver
+                </Button>
                 <h1 className="text-xl font-bold text-primary">Plataforma de cursos</h1>
-                <Button variant="ghost" size="sm" onClick={logout}>Cerrar sesión</Button>
+                <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+                    Cerrar sesión
+                </Button>
             </nav>
             <div className="max-w-6xl mx-auto px-8 py-8">
                 <div className="mb-6">
@@ -37,20 +44,7 @@ function CourseCatalog() {
                         placeholder="Buscar cursos..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="flex-1 min-w-48"
-                    />
-                    <Select value={category} onValueChange={val => setCategory(val === 'all' ? '' : val)}>
-                        <SelectTrigger className="w-48">
-                            <SelectValue placeholder="Todas las categorías" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">Todas las categorías</SelectItem>
-                            <SelectItem value="programming">Programación</SelectItem>
-                            <SelectItem value="design">Diseño</SelectItem>
-                            <SelectItem value="marketing">Marketing</SelectItem>
-                            <SelectItem value="maths">Matemáticas</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        className="flex-1 min-w-48" />
                     <Select value={level} onValueChange={val => setLevel(val === 'all' ? '' : val)}>
                         <SelectTrigger className="w-48">
                             <SelectValue placeholder="Todos los niveles" />

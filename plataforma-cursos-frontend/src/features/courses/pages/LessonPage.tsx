@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useAuth } from '@/app/providers/AuthContext';
 
 const schema = z.object({
     title: z.string().min(2, 'Minimo 2 caracteres'),
@@ -24,6 +25,7 @@ const schema = z.object({
 type LessonFormData = z.infer<typeof schema>
 
 function LessonPage() {
+    const { logout } = useAuth();
     const { courseId } = useParams();
     const navigate = useNavigate();
     const { course } = useCourse(Number(courseId));
@@ -58,7 +60,6 @@ function LessonPage() {
             if (editingLesson) {
                 const updatedLesson = await lessonService.update(Number(courseId), editingLesson.id, data);
                 setLessons(prev => prev.map(l => l.id === updatedLesson.id ? updatedLesson : l));
-                console.log('Lección actualizada:', updatedLesson);
             } else {
                 const newLesson = await lessonService.create(Number(courseId), data);
                 setLessons(prev => [...prev, newLesson]);
@@ -82,9 +83,12 @@ function LessonPage() {
         <>
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold text-primary">Lecciones</h1>
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/creator-dashboard')}>
+                    <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
                         ← Volver
+                    </Button>
+                    <h1 className="text-xl font-bold text-primary">Lecciones</h1>
+                    <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+                        Cerrar sesión
                     </Button>
                 </nav>
                 <div className="max-w-3xl mx-auto px-8 py-10">
@@ -93,11 +97,16 @@ function LessonPage() {
                             <h2 className="text-2xl font-bold">{course?.title}</h2>
                             <p className="text-muted-foreground text-sm">Gestiona las lecciones de este curso</p>
                         </div>
-                        <Button onClick={openCreateForm}>+ Nueva lección</Button>
-                        <Button variant="outline" onClick={() => {
-                            navigate(`/creator/courses/${courseId}/exam/new`)
-
-                        }}>+ Nuevo examen</Button>
+                        <div className="flex justify-end">
+                            <Button onClick={openCreateForm} className="hover:cursor-pointer">
+                                + Nueva lección
+                            </Button>
+                            <Button onClick={() => {
+                                navigate(`/creator/courses/${courseId}/exam/new`)
+                            }} className="hover:cursor-pointer">
+                                + Nuevo examen
+                            </Button>
+                        </div>
                     </div>
 
                     {showForm && (
@@ -151,7 +160,9 @@ function LessonPage() {
                         <Card>
                             <CardContent className="py-12 text-center">
                                 <p className="text-muted-foreground mb-4">No hay lecciones todavía.</p>
-                                <Button onClick={openCreateForm}>Crear primera lección</Button>
+                                <Button onClick={openCreateForm} className="hover:cursor-pointer">
+                                    Crear primera lección
+                                </Button>
                             </CardContent>
                         </Card>
                     ) : (
@@ -169,8 +180,12 @@ function LessonPage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-2">
-                                            <Button variant="outline" size="sm" onClick={() => openEditForm(lesson)}>Editar</Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(lesson.id)}>Eliminar</Button>
+                                            <Button variant="outline" size="sm" onClick={() => openEditForm(lesson)} className="hover:cursor-pointer">
+                                                Editar
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(lesson.id)} className="hover:cursor-pointer">
+                                                Eliminar
+                                            </Button>
                                         </div>
                                     </CardHeader>
                                 </Card>

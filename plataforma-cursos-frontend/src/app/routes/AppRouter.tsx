@@ -11,6 +11,10 @@ import LessonPage from '../../features/courses/pages/LessonPage';
 import CourseDetailPage from '../../features/courses/pages/CourseDetailPage';
 import CreateExamPage from '../../features/exams/pages/CreateExamePage';
 import ExamPage from '@/features/exams/pages/ExamPage';
+import LessonDetailPage from '@/features/courses/pages/LessonDetailPage';
+import CertificatePage from '@/features/courses/pages/CertificatePage';
+import ForumPage from '@/features/forums/pages/ForumPage';
+import ThreadDetailPage from '@/features/forums/pages/ThreadDetailPage';
 
 function AppRouter() {
     return (
@@ -71,6 +75,32 @@ function AppRouter() {
                         <ExamPage />
                     </ProtectedRoute>
                 } />
+
+                <Route path='/courses/:courseId/lessons/:lessonId' element={
+                    <ProtectedRoute allowedRoles={['student']}>
+                        <LessonDetailPage />
+                    </ProtectedRoute>
+                } />
+
+                <Route path='/certificates' element={
+                    <ProtectedRoute allowedRoles={['student', 'creator']}>
+                        <CertificatePage />
+                    </ProtectedRoute>
+                } />
+
+                <Route path='/forums/:courseId' element={
+                    <ProtectedRoute allowedRoles={['student']}>
+                        <ForumPage />
+                    </ProtectedRoute>
+                } />
+
+                <Route path='/forums/:courseId/threads/:threadId' element={
+                    <ProtectedRoute allowedRoles={['student', 'creator']}>
+                        <ThreadDetailPage />
+                    </ProtectedRoute>
+                } />
+                
+
             </Routes>
         </BrowserRouter>
     );

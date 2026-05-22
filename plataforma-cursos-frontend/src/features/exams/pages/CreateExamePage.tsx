@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/app/providers/AuthContext';
 
 interface Question {
     question: string;
@@ -14,6 +15,7 @@ interface Question {
 }
 
 function CreateExamPage() {
+    const { logout } = useAuth();
     const { courseId } = useParams();
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
@@ -79,9 +81,12 @@ function CreateExamPage() {
         <>
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold text-primary">Crear examen</h1>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/creator/courses/${courseId}/lessons`)}>
+                    <Button variant="ghost" size="sm" onClick={() => navigate(`/creator/courses/${courseId}/lessons`)} className="hover:cursor-pointer">
                         ← Volver
+                    </Button>
+                    <h1 className="text-xl font-bold text-primary">Crear examen</h1>
+                    <Button size="sm" onClick={logout} className="hover:cursor-pointer">
+                        Cerrar sesión
                     </Button>
                 </nav>
                 <div className="max-w-3xl mx-auto px-8 py-10 space-y-6">
@@ -105,7 +110,7 @@ function CreateExamPage() {
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <CardTitle className="text-base">Pregunta {qIndex + 1}</CardTitle>
                                 {questions.length > 1 && (
-                                    <Button variant="destructive" size="sm" onClick={() => removeQuestion(qIndex)}>
+                                    <Button variant="destructive" size="sm" onClick={() => removeQuestion(qIndex)} className="hover:cursor-pointer">
                                         Eliminar
                                     </Button>
                                 )}
@@ -145,10 +150,10 @@ function CreateExamPage() {
                     {error && <p className="text-destructive text-sm text-center">{error}</p>}
 
                     <div className="flex gap-3">
-                        <Button variant="outline" onClick={addQuestion} className="flex-1">
+                        <Button variant="outline" onClick={addQuestion} className="flex-1 hover:cursor-pointer">
                             + Agregar pregunta
                         </Button>
-                        <Button onClick={handleSubmit} disabled={submitting} className="flex-1">
+                        <Button onClick={handleSubmit} disabled={submitting} className="flex-1 hover:cursor-pointer">
                             {submitting ? 'Guardando...' : 'Crear examen'}
                         </Button>
                     </div>

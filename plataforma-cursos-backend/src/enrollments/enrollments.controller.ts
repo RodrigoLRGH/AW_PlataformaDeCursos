@@ -2,14 +2,14 @@ import { Controller, Get, Post, Body, UseGuards, Request, Param, ParseIntPipe } 
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EnrollmentsService } from './enrollments.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { UserRole } from '../users/entities/user.entity';
 import { Roles } from '../common/decorators/roles.decorator';
 
 // Permite a los estudiantes inscribirse en cursos y consultar sus matriculas
 @ApiTags('Enrollments')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AccessTokenGuard)
 @ApiBearerAuth()
 @Controller('enrollments')
 export class EnrollmentsController {
@@ -23,16 +23,16 @@ export class EnrollmentsController {
   @ApiOperation({ summary: 'Inscribirse en un curso' })
   @ApiResponse({ status: 201, description: 'Inscripción exitosa' })
   @ApiResponse({ status: 409, description: 'Ya estás inscrito en este curso' })
-  enroll(@Body() dto: CreateEnrollmentDto, @Request() req: { user: { id: number } }) {
-    return this.enrollmentsService.enroll(req.user.id, dto.courseId);
+  enroll(@Body() dto: CreateEnrollmentDto, @Request() req) {
+    return this.enrollmentsService.enroll(req.user.sub, dto.courseId);
   }
 
   // GET /enrollments/my
   // Devuelve las inscripciones del usuario autenticado
   @Get('my')
   @ApiOperation({ summary: 'Mis inscripciones' })
-  findMy(@Request() req: { user: { id: number } }) {
-    return this.enrollmentsService.findMyEnrollments(req.user.id);
+  findMy(@Request() req) {
+    return this.enrollmentsService.findMyEnrollments(req.user.sub);
   }
 
   // GET /enrollments/check/:courseId 
@@ -41,8 +41,7 @@ export class EnrollmentsController {
   @ApiOperation({ summary: 'Verificar si estoy inscrito en un curso' })
   checkEnrollment(
     @Param('courseId', ParseIntPipe) courseId: number,
-    @Request() req: { user: { id: number } },
-  ) {
-    return this.enrollmentsService.isEnrolled(req.user.id, courseId);
+    @Request() req,) {
+    return this.enrollmentsService.isEnrolled(req.user.sub, courseId);
   }
 }

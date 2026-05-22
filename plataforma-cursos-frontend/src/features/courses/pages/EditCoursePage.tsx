@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCourse } from '../hooks/useCourses.hook';
+import { useAuth } from '@/app/providers/AuthContext';
 
 const schema = z.object({
     title: z.string().min(3, 'Minimo 3 caracteres'),
@@ -26,6 +27,7 @@ type EditCourseFormData = z.infer<typeof schema>;
 
 function EditCoursePage() {
     const { id } = useParams();
+    const { logout } = useAuth();
     const navigate = useNavigate();
     const { course, loading } = useCourse(Number(id))
 
@@ -61,9 +63,12 @@ function EditCoursePage() {
     return (
         <div className="min-h-screen bg-muted/40">
             <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                <h1 className="text-xl font-bold text-primary">Editar curso</h1>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/creator-dashboard')}>
+                <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
                     ← Volver
+                </Button>
+                <h1 className="text-xl font-bold text-primary">Editar curso</h1>
+                <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+                    Cerrar sesión
                 </Button>
             </nav>
             <div className="max-w-2xl mx-auto px-8 py-10">
@@ -96,8 +101,7 @@ function EditCoursePage() {
                                     <Label>Nivel</Label>
                                     <Select
                                         value={watch('level') ?? ''}
-                                        onValueChange={val => setValue('level', val as 'beginner' | 'intermediate' | 'advanced')}
-                                    >
+                                        onValueChange={val => setValue('level', val as 'beginner' | 'intermediate' | 'advanced')}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccionar nivel" />
                                         </SelectTrigger>
@@ -119,8 +123,7 @@ function EditCoursePage() {
                                     <Label>Estado</Label>
                                     <Select
                                         value={watch('status') ?? ''}
-                                        onValueChange={val => setValue('status', val as 'draft' | 'published')}
-                                    >
+                                        onValueChange={val => setValue('status', val as 'draft' | 'published')}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Seleccionar estado" />
                                         </SelectTrigger>

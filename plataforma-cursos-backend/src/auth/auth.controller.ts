@@ -12,18 +12,12 @@ import { JwtPayload, JwtPayloadWithRefreshToken } from './types/jwt-payload.type
 interface AuthRequest { user: JwtPayload }
 interface AuthRequestWithRefresh { user: JwtPayloadWithRefreshToken }
 
-const cookieBase = (req: any) => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
-  path: '/',
-});
-
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
+  // Registro de nuevo usuario con limitación de tasa para evitar abusos
   @Post('register')
   @Throttle({ default: { ttl: 60, limit: 5 } })
   @ApiOperation({ summary: 'Registrar nuevo usuario' })
@@ -33,6 +27,7 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  // Inicio de sesión que devuelve tokens y establece cookies seguras
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'Iniciar sesión' })
@@ -44,6 +39,7 @@ export class AuthController {
     return { user };
   }
 
+  // Endpoint para renovar tokens usando el refresh token, protegido por la estrategia de refresh token
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   @HttpCode(200)
@@ -54,6 +50,7 @@ export class AuthController {
     return { message: 'Tokens renovados' };
   }
 
+  // Cierre de sesión que borra las cookies de tokens
   @Post('logout')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
@@ -64,6 +61,8 @@ export class AuthController {
     return this.authService.logout();
   }
 
+
+  // Endpoint para obtener los datos del usuario autenticado, protegido por la estrategia de access token
   @Get('me')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
@@ -74,6 +73,8 @@ export class AuthController {
     return this.authService.getMe(req.user.sub);
   }
 
+
+  // Método privado para establecer cookies seguras con los tokens de acceso y refresco
   private setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
     const base = {
       httpOnly: true,

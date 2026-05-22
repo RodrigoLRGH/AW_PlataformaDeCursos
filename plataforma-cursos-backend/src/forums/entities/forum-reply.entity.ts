@@ -1,13 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { ForumThread } from './forum-thread.entity';
 
@@ -25,7 +16,7 @@ export class ForumReply {
   threadId: string;
 
   @Column({ name: 'author_id' })
-  authorId: string;
+  authorId: number;
 
   @Column({ name: 'is_accepted_answer', default: false })
   isAcceptedAnswer: boolean;

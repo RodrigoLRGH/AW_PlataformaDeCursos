@@ -11,12 +11,12 @@ export class CoursesService {
   constructor(
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
-  ) {}
+  ) { }
 
   // Devuelve todos los cursos, con opcion de filtrar por estado (publicado o borrador)
 
   async findAll(isPublished?: boolean) {
-    const where: {status?: CourseStatus} = {};
+    const where: { status?: CourseStatus } = {};
     if (isPublished !== undefined) {
       where.status = isPublished ? CourseStatus.PUBLISHED : CourseStatus.DRAFT;
     }
@@ -52,8 +52,8 @@ export class CoursesService {
   async update(id: number, dto: UpdateCourseDto, userId: number) {
     const course = await this.findOne(id);
 
-    if (course.creatorId !== userId) {  
-      throw new ForbiddenException('No autorizado para modificar este curso');
+    if (Number(course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado para eliminar este curso')
     }
 
     const updatedCourse = await this.courseRepo.preload({ id, ...dto });
@@ -65,10 +65,10 @@ export class CoursesService {
   // Lanza ForbiddenException si el usuario autenticado no es el creador del curso
   async remove(id: number, userId: number) {
     const course = await this.findOne(id);
-    
-    if(course.creatorId !== userId) {
-      throw new ForbiddenException('No autorizado para eliminar este curso');
-    } 
+
+    if (Number(course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado para eliminar este curso')
+    }
     await this.courseRepo.remove(course);
     return { message: 'Curso eliminado' };
   }

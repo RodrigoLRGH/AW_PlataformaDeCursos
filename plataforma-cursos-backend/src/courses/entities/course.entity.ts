@@ -26,14 +26,11 @@ export enum CourseStatus {
 @Index(['status'])
 export class Course {
   @PrimaryGeneratedColumn()
-  id!: number; // El '!' evita el error 2564
+  id!: number;
 
   @Column({ length: 255 })
   title!: string;
 
-  // @Column({ type: 'text', nullable: true })
-  // description?: string;
-  // course.entity.ts
   @Column({ type: 'text', nullable: true })
   description?: string;
 
@@ -44,11 +41,11 @@ export class Course {
   level?: string;
 
   @Column({
-    type: 'decimal', // o 'float' si prefieres
+    type: 'decimal',
     precision: 10,
     scale: 2,
     default: 0.0,
-    nullable: false, // o false si quieres obligar precio
+    nullable: false,
   })
   price: number = 0;
 
@@ -71,7 +68,7 @@ export class Course {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // Relations
+  // Relaciones
   @ManyToOne(() => User, (user) => user.courses, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'creator_id' })
   creator!: User;
