@@ -9,6 +9,7 @@ import { useLessons } from '../hooks/useLessons.hook';
 import LessonForm from '../components/LessonForm';
 import { type LessonFormData } from '../components/LessonForm';
 import LessonList from '../components/LessonList';
+import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 
 function LessonPage() {
     const { logout } = useAuth();
@@ -18,6 +19,9 @@ function LessonPage() {
     const { lessons, setLessons, loading } = useLessons(Number(courseId));
     const [showForm, setShowForm] = useState(false);
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false)
+    const [lessonToDelete, setLessonToDelete] = useState<string | null>(null)
+    const [formError, setFormError] = useState('')
 
     const openCreateForm = () => {
         setEditingLesson(null);
@@ -41,18 +45,23 @@ function LessonPage() {
 
             setShowForm(false);
             setEditingLesson(null);
-        } catch (error) {
-            confirm('Ocurrió un error al guardar la lección. Por favor, intenta de nuevo.');
+        } catch (error: any) {
+            setFormError(error.response?.data?.message || 'Error al guardar la lección');
         }
     }
 
     const handleDelete = async (lessonId: string) => {
-        const confirmDelete = confirm('¿Estás seguro de que quieres eliminar esta lección? Esta acción no se puede deshacer.');
-        if (!confirmDelete) return;
-        await lessonService.remove(Number(courseId), lessonId);
-        setLessons(prev => prev.filter(l => l.id !== lessonId));
+        setLessonToDelete(lessonId)
+        setConfirmOpen(true)
     }
 
+    const confirmDelete = async () => {
+        if (!lessonToDelete) return
+        await lessonService.remove(Number(courseId), lessonToDelete)
+        setLessons(prev => prev.filter(l => l.id !== lessonToDelete))
+        setConfirmOpen(false)
+        setLessonToDelete(null)
+    }
     return (
         <>
             <div className="min-h-screen bg-muted/40">
@@ -87,11 +96,8 @@ function LessonPage() {
                         <LessonForm
                             editingLesson={editingLesson ?? undefined}
                             onSubmit={handleSubmit}
-                            onCancel={() => {
-                                setShowForm(false);
-                            }}
-
-                        />
+                            onCancel={() => { setShowForm(false); setFormError('') }}
+                            error={formError} />
                     )}
 
                     {loading ? (
@@ -117,6 +123,18 @@ function LessonPage() {
                     )}
                 </div>
             </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Eliminar lección"
+                description="¿Estás seguro de que quieres eliminar esta lección? Esta acción no se puede deshacer."
+                confirmLabel="Eliminar"
+                variant="destructive"
+                onConfirm={confirmDelete}
+                onCancel={() => {
+                    setConfirmOpen(false)
+                    setLessonToDelete(null)
+                }}
+            />
         </>
     )
 }

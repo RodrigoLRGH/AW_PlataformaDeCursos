@@ -76,7 +76,7 @@ export class ProgressService {
 
   async getProgressByCourse(userId: number, courseId: number) {
     const lessons = await this.lessonRepo.find({
-      where: { courseId: courseId },
+      where: { courseId },
     });
     const lessonIds = lessons.map((l) => l.id);
 

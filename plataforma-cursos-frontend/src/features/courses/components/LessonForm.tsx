@@ -22,10 +22,11 @@ interface Props {
     editingLesson?: LessonFormData;
     onSubmit: (data: LessonFormData) => void;
     onCancel: () => void;
+    error?: string;
 }
 
-function LessonForm({ editingLesson, onSubmit, onCancel }: Props) {
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<LessonFormData>({
+function LessonForm({ editingLesson, onSubmit, onCancel, error }: Props) {
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting }, setError } = useForm<LessonFormData>({
         resolver: zodResolver(schema),
     });
 
@@ -74,6 +75,7 @@ function LessonForm({ editingLesson, onSubmit, onCancel }: Props) {
                                 <Input type="number" min="0" {...register('durationMinutes', { valueAsNumber: true })} />
                             </div>
                         </div>
+                        {error && <p className="text-destructive text-sm text-center">{error}</p>}
                         {errors.root && <p className="text-destructive text-sm text-center">{errors.root.message}</p>}
                         <div className="flex gap-3">
                             <Button type="submit" disabled={isSubmitting} className="flex-1">
