@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useNavigate } from 'react-router'
+import { ArrowLeft } from 'lucide-react'
 
 function CourseCatalog() {
     const { logout } = useAuth()
@@ -27,7 +28,7 @@ function CourseCatalog() {
         <div className="min-h-screen bg-muted/40">
             <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                 <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
-                    ← Volver
+                    <ArrowLeft size={16} /> Volver
                 </Button>
                 <h1 className="text-xl font-bold text-primary">Plataforma de cursos</h1>
                 <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">

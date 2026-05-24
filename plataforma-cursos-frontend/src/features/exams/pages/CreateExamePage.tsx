@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/app/providers/AuthContext';
+import { ArrowLeft } from 'lucide-react';
 
 interface Question {
     question: string;
@@ -82,7 +83,7 @@ function CreateExamPage() {
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                     <Button variant="ghost" size="sm" onClick={() => navigate(`/creator/courses/${courseId}/lessons`)} className="hover:cursor-pointer">
-                        ← Volver
+                        <ArrowLeft size={16} /> Volver
                     </Button>
                     <h1 className="text-xl font-bold text-primary">Crear examen</h1>
                     <Button size="sm" onClick={logout} className="hover:cursor-pointer">

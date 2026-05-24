@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useCourse } from '../hooks/useCourses.hook';
 import { useAuth } from '@/app/providers/AuthContext';
+import { ArrowLeft, X } from 'lucide-react';
 
 const schema = z.object({
     title: z.string().min(3, 'Minimo 3 caracteres'),
@@ -64,7 +65,7 @@ function EditCoursePage() {
         <div className="min-h-screen bg-muted/40">
             <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                 <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
-                    ← Volver
+                    <ArrowLeft size={16} /> Volver
                 </Button>
                 <h1 className="text-xl font-bold text-primary">Editar curso</h1>
                 <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
@@ -141,7 +142,7 @@ function EditCoursePage() {
                                 </Button>
                                 <Button type="button" variant="outline" className="flex-1"
                                     onClick={() => navigate('/creator-dashboard')}>
-                                    Cancelar
+                                    <X size={16} /> Cancelar
                                 </Button>
                             </div>
                         </form>

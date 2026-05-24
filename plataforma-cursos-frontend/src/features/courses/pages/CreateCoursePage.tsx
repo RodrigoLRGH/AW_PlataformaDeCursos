@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/app/providers/AuthContext';
+import { ArrowLeft, X } from 'lucide-react';
 
 
 const schema = z.object({
@@ -44,7 +45,7 @@ export function CreateCoursePage() {
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                     <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
-                        ← Volver
+                        <ArrowLeft size={16} /> Volver
                     </Button>
                     <h1 className="text-xl font-bold text-primary">Nuevo curso</h1>
                     <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
@@ -97,12 +98,12 @@ export function CreateCoursePage() {
                                     {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
                                 </div>
                                 <div className="flex gap-3 pt-2">
-                                    <Button type="submit" className="flex-1 hover:cursor-pointer" disabled={isSubmitting} >
-                                        {isSubmitting ? 'Guardando...' : 'Crear curso'}
-                                    </Button>
                                     <Button type="button" variant="outline" className="flex-1 hover:cursor-pointer"
                                         onClick={() => navigate('/creator-dashboard')}>
-                                        Cancelar
+                                        <X size={16} /> Cancelar
+                                    </Button>
+                                    <Button type="submit" className="flex-1 hover:cursor-pointer" disabled={isSubmitting} >
+                                        {isSubmitting ? 'Guardando...' : 'Crear curso'}
                                     </Button>
                                 </div>
                             </form>

@@ -5,6 +5,7 @@ import { useExamByCourse, useExamQuestions } from '../hooks/useExam.hook'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ArrowLeft } from 'lucide-react'
 
 function ExamPage() {
     const { courseId } = useParams()
@@ -51,7 +52,9 @@ function ExamPage() {
             <Card className="max-w-md w-full">
                 <CardContent className="py-12 text-center">
                     <p className="text-muted-foreground mb-4">Este curso no tiene examen todavía.</p>
-                    <Button onClick={() => navigate(`/courses/${courseId}`)}>← Volver al curso</Button>
+                    <Button onClick={() => navigate(`/courses/${courseId}`)}>
+                        <ArrowLeft size={16} /> Volver al curso
+                    </Button>
                 </CardContent>
             </Card>
         </div>

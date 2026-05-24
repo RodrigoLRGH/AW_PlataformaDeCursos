@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useMyCourses } from '@/features/courses/hooks/useCourses.hook'
-import { CircleUser } from 'lucide-react'
+import { CircleUser, Plus } from 'lucide-react'
 import { useState } from 'react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 
@@ -49,7 +49,7 @@ function CreatorDashboard() {
               <p className="text-muted-foreground">Gestiona tus cursos publicados y borradores</p>
             </div>
             <Button onClick={() => navigate('/creator/courses/new')} className="hover:cursor-pointer">
-              + Nuevo curso
+              <Plus />Nuevo curso
             </Button>
           </div>
           {loading ? (

@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { X } from 'lucide-react';
 
 const schema = z.object({
     title: z.string().min(2, 'Minimo 2 caracteres'),
@@ -26,7 +27,7 @@ interface Props {
 }
 
 function LessonForm({ editingLesson, onSubmit, onCancel, error }: Props) {
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting }, setError } = useForm<LessonFormData>({
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<LessonFormData>({
         resolver: zodResolver(schema),
     });
 
@@ -78,11 +79,11 @@ function LessonForm({ editingLesson, onSubmit, onCancel, error }: Props) {
                         {error && <p className="text-destructive text-sm text-center">{error}</p>}
                         {errors.root && <p className="text-destructive text-sm text-center">{errors.root.message}</p>}
                         <div className="flex gap-3">
+                            <Button type="button" variant="outline" className="flex-1" onClick={() => onCancel()}>
+                                <X size={16} /> Cancelar
+                            </Button>
                             <Button type="submit" disabled={isSubmitting} className="flex-1">
                                 {isSubmitting ? 'Guardando...' : editingLesson ? 'Guardar cambios' : 'Crear lección'}
-                            </Button>
-                            <Button type="button" variant="outline" className="flex-1" onClick={() => onCancel()}>
-                                Cancelar
                             </Button>
                         </div>
                     </form>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/app/providers/AuthContext';
+import { ArrowLeft } from 'lucide-react';
 
 function LessonDetailPage() {
     const { logout } = useAuth();
@@ -54,7 +55,7 @@ function LessonDetailPage() {
         <div className="min-h-screen bg-muted/40">
             <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                 <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
-                    ← Volver al curso
+                    <ArrowLeft size={16} /> Volver al curso
                 </Button>
                 <h1 className="text-xl font-bold text-primary">Lección</h1>
                 <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">

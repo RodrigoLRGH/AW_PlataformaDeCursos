@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 function CertificatePage() {
     const navigate = useNavigate();
@@ -36,8 +37,9 @@ function CertificatePage() {
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
 
                     <Button size="sm" onClick={() => navigate('/student-dashboard')} className="hover:cursor-pointer">
-                        ← Volver al dashboard
-                    </Button><h1 className="text-xl font-bold text-primary">Mis Certificados</h1>
+                        <ArrowLeft size={16} /> Volver al dashboard
+                    </Button>
+                    <h1 className="text-xl font-bold text-primary">Mis Certificados</h1>
                     <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
                         Cerrar sesión
                     </Button>

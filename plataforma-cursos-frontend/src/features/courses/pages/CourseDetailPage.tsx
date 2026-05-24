@@ -11,6 +11,7 @@ import { progressService } from '../services/progressService';
 import { useProgress } from '../hooks/useProgress.hook';
 import { certificateService } from '../services/certificateService';
 import { useAuth } from '@/app/providers/AuthContext';
+import { ArrowLeft } from 'lucide-react';
 
 const levelLabels: Record<string, string> = {
     beginner: 'Principiante',
@@ -96,7 +97,7 @@ function CourseDetailPage() {
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                     <Button size="sm" className="px-4 hover:cursor-pointer" onClick={() => navigate(-1)}>
-                        ← Volver
+                        <ArrowLeft size={16} /> Volver
                     </Button>
                     <h1 className="text-xl font-bold text-primary">Plataforma de cursos</h1>
                     <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">

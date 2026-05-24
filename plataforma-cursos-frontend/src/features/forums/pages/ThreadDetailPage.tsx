@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForm } from 'react-hook-form';
-import { CircleUser } from 'lucide-react';
+import { ArrowLeft, CircleUser } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const schema = z.object({
@@ -57,7 +57,7 @@ function ThreadDetailPage() {
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                     <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
-                        ← Volver al foro
+                        <ArrowLeft size={16} /> Volver al foro
                     </Button>
                     <h1 className="text-xl font-bold text-primary">Hilo del foro</h1>
                 </nav>

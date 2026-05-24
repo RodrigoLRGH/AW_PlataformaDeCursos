@@ -10,6 +10,7 @@ import LessonForm from '../components/LessonForm';
 import { type LessonFormData } from '../components/LessonForm';
 import LessonList from '../components/LessonList';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
+import { ArrowLeft, Plus } from 'lucide-react';
 
 function LessonPage() {
     const { logout } = useAuth();
@@ -67,7 +68,7 @@ function LessonPage() {
             <div className="min-h-screen bg-muted/40">
                 <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                     <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
-                        ← Volver
+                        <ArrowLeft size={16} /> Volver
                     </Button>
                     <h1 className="text-xl font-bold text-primary">Lecciones</h1>
                     <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
@@ -82,12 +83,12 @@ function LessonPage() {
                         </div>
                         <div className="flex justify-end">
                             <Button onClick={openCreateForm} className="hover:cursor-pointer">
-                                + Nueva lección
+                                <Plus /> Nueva lección
                             </Button>
                             <Button onClick={() => {
                                 navigate(`/creator/courses/${courseId}/exam/new`)
                             }} className="hover:cursor-pointer">
-                                + Nuevo examen
+                                <Plus /> Nuevo examen
                             </Button>
                         </div>
                     </div>

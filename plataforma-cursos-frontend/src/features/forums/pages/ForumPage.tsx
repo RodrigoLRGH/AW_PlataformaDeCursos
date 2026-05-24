@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useForm } from 'react-hook-form';
 import { Textarea } from '@/components/ui/textarea';
-import { CircleUser } from 'lucide-react';
+import { ArrowLeft, CircleUser } from 'lucide-react';
 
 const schema = z.object({
     title: z.string().min(5, 'El título debe tener al menos 5 caracteres'),
@@ -63,7 +63,7 @@ function ForumPage() {
                 <div className="min-h-screen bg-muted/40">
                     <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
                         <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
-                            ← Volver al curso
+                            <ArrowLeft size={16} /> Volver al curso
                         </Button>
                         <h1 className="text-xl font-bold text-primary">Foro del curso</h1>
                     </nav>
