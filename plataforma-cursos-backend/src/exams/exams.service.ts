@@ -1,4 +1,8 @@
-﻿import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+﻿import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { Exam } from './entities/exam.entity';
@@ -7,6 +11,8 @@ import { ExamResult } from './entities/exam-result.entity';
 import { Course } from '../courses/entities/course.entity';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { SubmitExamDto } from './dto/submit-exam.dto';
+import { Enrollment } from '../enrollments/entities/enrollment.entity';
+import { UpdateExamDto } from './dto/update-exam.dto';
 
 // Servicio de examenes
 // Gestiona la creacion, consulta y envio de resultados de examenes por curso
@@ -21,7 +27,9 @@ export class ExamsService {
     private readonly resultRepo: Repository<ExamResult>,
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
-  ) { }
+    @InjectRepository(Enrollment)
+    private readonly enrollmentRepo: Repository<Enrollment>,
+  ) {}
 
   // Crear un examen con sus preguntas para un curso
   // Solo el creador del curso puede crear examenes
@@ -42,14 +50,15 @@ export class ExamsService {
     const savedExam = await this.examRepo.save(exam);
 
     if (dto.questions && dto.questions.length > 0) {
-      const questions = dto.questions.map((q, index) => this.questionRepo.create({
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        order: q.order ?? index + 1,
-        points: q.points ?? 1,
-        examId: savedExam.id,
-      })
+      const questions = dto.questions.map((q, index) =>
+        this.questionRepo.create({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          order: q.order ?? index + 1,
+          points: q.points ?? 1,
+          examId: savedExam.id,
+        }),
       );
       await this.questionRepo.save(questions);
     }
@@ -69,7 +78,23 @@ export class ExamsService {
   }
 
   // Devuelve las preguntas de un examen sin exponer las respuestas correctas
-  async getQuestionsForStudent(examId: string) {
+  async getQuestionsForStudent(examId: string, userId: number) {
+    const exam = await this.examRepo.findOne({
+      where: { id: examId },
+      relations: ['course'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+
+    const enrollment = await this.enrollmentRepo.findOne({
+      where: { userId, courseId: exam.courseId },
+    });
+    if (!enrollment)
+      throw new ForbiddenException('No estás inscrito en este curso');
+    if (!enrollment.completedAt)
+      throw new ForbiddenException(
+        'Debes completar todas las lecciones antes de realizar el examen',
+      );
+
     const questions = await this.questionRepo.find({
       where: { examId },
       order: { order: 'ASC' },
@@ -82,13 +107,23 @@ export class ExamsService {
   async submit(examId: string, userId: number, dto: SubmitExamDto) {
     const exam = await this.examRepo.findOne({
       where: { id: examId },
-      relations: ['questions'],
+      relations: ['questions', 'course'],
     });
     if (!exam) throw new NotFoundException('Examen no encontrado');
 
-    const answersMap: Record<string, number> = {}
+    const enrollment = await this.enrollmentRepo.findOne({
+      where: { userId, courseId: exam.courseId },
+    });
+    if (!enrollment)
+      throw new ForbiddenException('No estás inscrito en este curso');
+    if (!enrollment.completedAt)
+      throw new ForbiddenException(
+        'Debes completar todas las lecciones antes de realizar el examen',
+      );
+
+    const answersMap: Record<string, number> = {};
     for (const answer of dto.answers) {
-      answersMap[answer.questionId] = answer.selectedOption
+      answersMap[answer.questionId] = answer.selectedOption;
     }
 
     let correct = 0;
@@ -127,5 +162,79 @@ export class ExamsService {
     return this.examRepo.findOne({
       where: { courseId },
     });
+  }
+
+  // Devuelve el examen completo con preguntas (incluyendo correctAnswer) solo si el usuario es el creador del curso
+  async getExamForCreator(examId: string, userId: number) {
+    const exam = await this.examRepo.findOne({
+      where: { id: examId },
+      relations: ['questions', 'course'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+
+    if (Number(exam.course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado para ver este examen');
+    }
+    return exam;
+  }
+
+  // Actualizar un examen completo (incluyendo preguntas)
+  // Solo el creador del curso puede actualizar el examen
+  async updateExam(examId: string, userId: number, dto: UpdateExamDto) {
+    const exam = await this.examRepo.findOne({
+      where: { id: examId },
+      relations: ['course'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+    if (Number(exam.course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado para modificar este examen');
+    }
+
+    if (dto.title !== undefined) exam.title = dto.title;
+    if (dto.passingScore !== undefined) exam.passingScore = dto.passingScore;
+    if (dto.timeLimitMinutes !== undefined)
+      exam.timeLimitMinutes = dto.timeLimitMinutes;
+    await this.examRepo.save(exam);
+
+    if (dto.questions !== undefined) {
+      await this.questionRepo.delete({ examId: exam.id });
+
+      if (dto.questions.length > 0) {
+        const newQuestions = dto.questions.map((q, index) =>
+          this.questionRepo.create({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            order: q.order ?? index + 1,
+            points: q.points ?? 1,
+            examId: exam.id,
+          }),
+        );
+        await this.questionRepo.save(newQuestions);
+      }
+    }
+
+    return this.findOne(exam.id);
+  }
+
+  async deleteExam(examId: string, userId: number) {
+    const exam = await this.examRepo.findOne({
+      where: { id: examId },
+      relations: ['course'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+    if (Number(exam.course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado');
+    }
+    await this.examRepo.remove(exam);
+    return { message: 'Examen eliminado' };
+  }
+
+  async findByCreator(userId: number) {
+    return this.examRepo
+      .createQueryBuilder('exam')
+      .leftJoinAndSelect('exam.course', 'course')
+      .where('course.creatorId = :userId', { userId })
+      .getMany();
   }
 }

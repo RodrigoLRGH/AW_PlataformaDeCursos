@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Lesson } from './entities/lesson.entity';
@@ -12,7 +16,7 @@ export class LessonsService {
   constructor(
     @InjectRepository(Lesson) private readonly lessonRepo: Repository<Lesson>,
     @InjectRepository(Course) private readonly courseRepo: Repository<Course>,
-  ) { }
+  ) {}
 
   // Deuelve todas las lecciones de un curso ordenadas por su campo 'order'
   async findByCourse(courseId: number) {
@@ -33,27 +37,60 @@ export class LessonsService {
   // Crea una leccion en un curso. Solo el creador del curso puede agregar lecciones
   // Lanza ForbiddenException si el usuario no es el creador del curso
   async create(courseId: number, dto: CreateLessonDto, userId: number) {
-    const course = await this.courseRepo.findOne({ where: { id: courseId } })
-    console.log('course.creatorId:', course?.creatorId, typeof course?.creatorId)
-    console.log('userId:', userId, typeof userId)
-    if (!course) throw new NotFoundException('Curso no encontrado')
+    const course = await this.courseRepo.findOne({ where: { id: courseId } });
+    console.log(
+      'course.creatorId:',
+      course?.creatorId,
+      typeof course?.creatorId,
+    );
+    console.log('userId:', userId, typeof userId);
+    if (!course) throw new NotFoundException('Curso no encontrado');
     if (Number(course.creatorId) !== Number(userId)) {
-      throw new ForbiddenException('No autorizado')
+      throw new ForbiddenException('No autorizado');
     }
 
     const lesson = this.lessonRepo.create({ ...dto, courseId });
     return this.lessonRepo.save(lesson);
   }
   // Actualiza una lección existente
-  async update(id: string, dto: UpdateLessonDto) {
+  async update(
+    id: string,
+    courseId: number,
+    userId: number,
+    dto: UpdateLessonDto,
+  ) {
     const lesson = await this.findOne(id);
+    if (lesson.courseId !== courseId) {
+      throw new ForbiddenException(
+        'La lección no pertenece al curso especificado',
+      );
+    }
+    const course = await this.courseRepo.findOne({ where: { id: courseId } });
+    if (!course) throw new NotFoundException('Curso no encontrado');
+    if (Number(course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException(
+        'No autorizado para modificar lecciones de este curso',
+      );
+    }
     Object.assign(lesson, dto);
     return this.lessonRepo.save(lesson);
   }
 
   // Elimina una lección por su ID
-  async remove(id: string) {
+  async remove(id: string, courseId: number, userId: number) {
+    const lesson = await this.findOne(id);
+    if (lesson.courseId !== courseId) {
+      throw new ForbiddenException(
+        'La lección no pertenece al curso especificado',
+      );
+    }
+    const course = await this.courseRepo.findOne({ where: { id: courseId } });
+    if (!course) throw new NotFoundException('Curso no encontrado');
+    if (Number(course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException(
+        'No autorizado para eliminar lecciones de este curso',
+      );
+    }
     return await this.lessonRepo.delete({ id });
   }
-
 }

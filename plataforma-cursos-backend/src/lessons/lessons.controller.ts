@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -8,11 +19,11 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 
-// Gestionar rutas anidadas 
+// Gestionar rutas anidadas
 @ApiTags('Lessons')
 @Controller('courses/:courseId/lessons')
 export class LessonsController {
-  constructor(private readonly lessonsService: LessonsService) { }
+  constructor(private readonly lessonsService: LessonsService) {}
 
   // GET /courses/:courseId/lessons - Listar lecciones de un curso
   @Get()
@@ -39,7 +50,7 @@ export class LessonsController {
     @Body() dto: CreateLessonDto,
     @Request() req,
   ) {
-    return this.lessonsService.create(courseId, dto, req.user.sub)
+    return this.lessonsService.create(courseId, dto, req.user.sub);
   }
 
   // PUT /courses/:courseId/lessons/:id - Actualizar lección (solo para creadores del curso)
@@ -49,10 +60,12 @@ export class LessonsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Actualizar lección' })
   update(
+    @Param('courseId', ParseIntPipe) courseId: number,
     @Param('id') id: string,
     @Body() dto: UpdateLessonDto,
+    @Request() req,
   ) {
-    return this.lessonsService.update(id, dto);
+    return this.lessonsService.update(id, courseId, req.user.sub, dto);
   }
 
   // DELETE /courses/:courseId/lessons/:id - Eliminar lección (solo para creadores del curso)
@@ -61,7 +74,11 @@ export class LessonsController {
   @Roles(UserRole.CREATOR)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Eliminar lección' })
-  remove(@Param('id') id: string) {
-    return this.lessonsService.remove(id);
+  remove(
+    @Param('courseId', ParseIntPipe) courseId: number,
+    @Param('id') id: string,
+    @Request() req,
+  ) {
+    return this.lessonsService.remove(id, courseId, req.user.sub);
   }
 }

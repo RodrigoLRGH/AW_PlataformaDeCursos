@@ -1,4 +1,8 @@
-﻿import { Injectable, NotFoundException, ForbiddenException, } from '@nestjs/common';
+﻿import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Certificate } from './entities/certificate.entity';
@@ -13,7 +17,7 @@ export class CertificatesService {
     @InjectRepository(Certificate) private certRepo: Repository<Certificate>,
     @InjectRepository(Enrollment)
     private enrollmentRepo: Repository<Enrollment>,
-  ) { }
+  ) {}
 
   // Generar certificado al completar un curso
   async generate(userId: number, courseId: number) {
@@ -25,10 +29,11 @@ export class CertificatesService {
     if (!enrollment)
       throw new NotFoundException('No estás inscrito en este curso');
 
-    if (!enrollment.completedAt && !(enrollment as any).completed)
+    if (!enrollment.completedAt) {
       throw new ForbiddenException(
         'Debes completar el curso antes de obtener el certificado',
       );
+    }
 
     const existing = await this.certRepo.findOne({
       where: { userId: Number(userId), courseId: Number(courseId) } as any,
@@ -52,7 +57,6 @@ export class CertificatesService {
       relations: ['course'],
     });
   }
-
 
   // Descargar certificado en PDF, verifica que el certificado exista y que el usuario sea el dueño antes de generar el PDF
   async downloadPdf(certId: string, userId: number): Promise<Buffer> {
@@ -97,7 +101,13 @@ export class CertificatesService {
         .fontSize(28)
         .font('Helvetica-Bold')
         .fillColor('#1a472a')
-        .text(`${cert.user?.firstName || ''} ${cert.user?.lastName || ''}`.trim() || 'Estudiante', 0, 220, { align: 'center' })
+        .text(
+          `${cert.user?.firstName || ''} ${cert.user?.lastName || ''}`.trim() ||
+            'Estudiante',
+          0,
+          220,
+          { align: 'center' },
+        );
 
       doc
         .fontSize(16)
