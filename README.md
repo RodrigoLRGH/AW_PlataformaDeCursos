@@ -3,14 +3,15 @@
 **Materia:** Aplicaciones WEB
 **Grupo:** ISyTE G-961 — 2026
 **Equipo:**
+
 - Lira Palafox
 - López Rojas
 - Mar Garcia
 
 ## Descripción
+
 Repositorio del proyecto de Plataforma de
  cursos para la materia de aplicaciones web
-
 
 ## Tecnologías utilizadas
 
@@ -22,23 +23,23 @@ Repositorio del proyecto de Plataforma de
 | TypeScript | AA |
 | Vite |  AA |
 
-
-
 ## Instalación
 
 1. Clona el repositorio:
+
 ```bash
    git clone https://github.com/RodrigoLRGH/AW_PlataformaDeCursos
 ```
 
+1. Entra a las carpeta del proyecto:
 
-2. Entra a las carpeta del proyecto:
 ```bash
    cd plataforma-cursos-backend
    cd plataforma-cursos-frontend
 ```
 
-3. Instala las dependencias:
+1. Instala las dependencias:
+
 ```bash
    npm install
 ```
@@ -51,11 +52,10 @@ Repositorio del proyecto de Plataforma de
 |---|---|
 | `npm run dev` | AA|
 
-
 ## Comandos Frontend
 
 | Comando | Descripción |
 |---|---|
-| `npm run dev` | AA |
+| `npm run dev` | Inicia el servidor local en <http://localhost:5173> |
 
 ## Funcionalidades
