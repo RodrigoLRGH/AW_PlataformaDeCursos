@@ -38,8 +38,8 @@ function LoginPage() {
 
     return (
         <>
-            <div className="min-h-screen flex items-center justify-center bg-muted/40">
-                <Card className="w-full max-w-md shadow-lg">
+            <div className="min-h-screen flex items-center justify-center bg-fondo">
+                <Card className="w-full max-w-md shadow-lg bg-fondo-claro">
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
                     </CardHeader>
@@ -60,9 +60,9 @@ function LoginPage() {
                                 {isSubmitting ? 'Cargando...' : 'Entrar'}
                             </Button>
                         </form>
-                        <p className="text-center text-sm mt-4 text-muted-foreground">
+                        <p className="text-center text-sm mt-4 text-secundario">
                             ¿No tienes cuenta?{' '}
-                            <Link to="/register" className="text-primary hover:underline">Regístrate</Link>
+                            <Link to="/register" className="text-primario hover:underline">Regístrate</Link>
                         </p>
                     </CardContent>
                 </Card>

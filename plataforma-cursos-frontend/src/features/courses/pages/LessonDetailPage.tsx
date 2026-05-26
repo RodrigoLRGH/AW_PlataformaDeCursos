@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/app/providers/AuthContext';
 import { ArrowLeft } from 'lucide-react';
-import AlertMessageDialog from '@/shared/components/AlertMessageDialog';
+import { useTheme } from '@/hooks/useTheme'
+import { Sun, Moon } from 'lucide-react'
 
 function LessonDetailPage() {
     const { logout } = useAuth();
@@ -17,9 +18,8 @@ function LessonDetailPage() {
     const [completed, setCompleted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [completing, setCompleting] = useState(false);
-    const [openAlert, setOpenAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-
+    const { isDark, toggleTheme } = useTheme()
+    
     useEffect(() => {
         if (!courseId || !lessonId) return;
         lessonService.getOne(Number(courseId), lessonId)
@@ -41,12 +41,10 @@ function LessonDetailPage() {
             const result = await progressService.markComplete(lessonId);
             setCompleted(true);
             if (result.courseCompleted) {
-                setAlertMessage('¡Felicidades! Completaste el curso');
-                setOpenAlert(true);
+                alert('Has completado el curso');
             }
         } catch (error: any) {
-            setAlertMessage(error.response?.data?.message || 'Error al marcar lección');
-            setOpenAlert(true);
+            alert(error.response?.data?.message || 'Error al marcar leccion');
         } finally {
             setCompleting(false);
         }
@@ -54,67 +52,68 @@ function LessonDetailPage() {
 
     if (loading) return <p className="text-center">Cargando...</p>;
 
-    if (!lesson) return <p className="text-center">Lección no encontrada</p>;
+    if (!lesson) return <p className="text-center">Leccion no encontrada</p>;
 
     return (
-        <>
-            <div className="min-h-screen bg-muted/40">
-                <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                    <Button size="sm" onClick={() => navigate(-1)} className="hover:cursor-pointer">
-                        <ArrowLeft size={16} /> Volver al curso
-                    </Button>
-                    <h1 className="text-xl font-bold text-primary">Lección</h1>
-                    <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
-                        Cerrar sesión
-                    </Button>
-                </nav>
-                <div className="max-w-3xl mx-auto px-8 py-8 space-y-6">
-                    <div className="flex justify-between items-start gap-4">
-                        <div>
-                            <h2 className="text-2xl font-bold mb-2">{lesson.title}</h2>
-                            <div className="flex gap-2">
-                                {lesson.order && <Badge variant="outline">Lección #{lesson.order}</Badge>}
-                                {lesson.durationMinutes && <Badge variant="secondary">{lesson.durationMinutes} min</Badge>}
-                            </div>
-                        </div>
-                        {completed ? (
-                            <Badge variant="default" className="text-sm px-3 py-1">Completada</Badge>
-                        ) : (
-                            <Button onClick={handleComplete} disabled={completing} className="hover:cursor-pointer">
-                                {completing ? 'Guardando...' : 'Marcar como completada'}
-                            </Button>
-                        )}
+        <div className="min-h-screen bg-fondo">
+            <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
+                    <div className="flex flex-1">
+                        <Button size="sm" onClick={() => navigate(-1)}>
+                            <ArrowLeft size={16} /> Volver al curso
+                        </Button>
                     </div>
 
-                    {lesson.contentUrl && (
-                        <Card>
-                            <CardHeader><CardTitle>Contenido</CardTitle></CardHeader>
-                            <CardContent>
-                                <a href={lesson.contentUrl} target="_blank" rel="noopener noreferrer"
-                                    className="text-primary hover:underline break-all">
-                                    {lesson.contentUrl}
-                                </a>
-                            </CardContent>
-                        </Card>
-                    )}
+                    <h1 className="text-xl font-bold text-primario">Leccion</h1>
 
-                    {lesson.description && (
-                        <Card>
-                            <CardHeader><CardTitle>Descripción</CardTitle></CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground whitespace-pre-wrap">{lesson.description}</p>
-                            </CardContent>
-                        </Card>
+                    <div className="flex flex-1 justify-end items-center gap-2">
+                        <Button variant="ghost" size="icon" onClick={toggleTheme}>
+                            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={logout}>
+                            Cerrar sesion
+                        </Button>
+                    </div>
+                </nav>
+            <div className="max-w-3xl mx-auto px-8 py-8 space-y-6">
+                <div className="flex justify-between items-start gap-4">
+                    <div>
+                        <h2 className="text-2xl text-primario font-bold mb-2">{lesson.title}</h2>
+                        <div className="flex gap-2">
+                            {lesson.order && <Badge variant="outline">Leccion #{lesson.order}</Badge>}
+                            {lesson.durationMinutes && <Badge variant="secondary">{lesson.durationMinutes} min</Badge>}
+                        </div>
+                    </div>
+                    {completed ? (
+                        <Badge variant="default" className="text-sm px-3 py-1">Completada</Badge>
+                    ) : (
+                        <Button onClick={handleComplete} disabled={completing} >
+                            {completing ? 'Guardando...' : 'Marcar como completada'}
+                        </Button>
                     )}
                 </div>
+
+                {lesson.contentUrl && (
+                    <Card>
+                        <CardHeader><CardTitle>Contenido</CardTitle></CardHeader>
+                        <CardContent>
+                            <a href={lesson.contentUrl} target="_blank" rel="noopener noreferrer"
+                                className="text-primario hover:underline break-all">
+                                {lesson.contentUrl}
+                            </a>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {lesson.description && (
+                    <Card>
+                        <CardHeader><CardTitle>Descripcion</CardTitle></CardHeader>
+                        <CardContent>
+                            <p className="text-secundario whitespace-pre-wrap">{lesson.description}</p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
-            <AlertMessageDialog
-                open={openAlert}
-                title="Aviso"
-                description={alertMessage}
-                onClose={() => setOpenAlert(false)}
-            />
-        </>
+        </div>
     )
 }
 

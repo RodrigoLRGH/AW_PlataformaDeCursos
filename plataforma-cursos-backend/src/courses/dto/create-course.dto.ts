@@ -4,17 +4,21 @@ import {
   IsNumber,
   IsBoolean,
   Min,
+  MaxLength,
+  Max,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourseDto {
   @ApiProperty()
   @IsString()
+  @MaxLength(75)
   title: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
+  @MaxLength(90)
   description?: string;
 
   @ApiProperty({ required: false })
@@ -31,6 +35,7 @@ export class CreateCourseDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
+  @MaxLength(25)
   category?: string;
 
   @ApiProperty({
