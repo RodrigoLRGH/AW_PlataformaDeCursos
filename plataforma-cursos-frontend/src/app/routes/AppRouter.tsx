@@ -132,7 +132,6 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-        // Ruta para editar un examen existente (solo para creador)
         <Route
           path="/creator/courses/:courseId/exam/edit/:examId"
           element={

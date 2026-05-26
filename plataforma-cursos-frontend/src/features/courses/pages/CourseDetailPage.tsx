@@ -12,6 +12,7 @@ import { useProgress } from '../hooks/useProgress.hook';
 import { certificateService } from '../services/certificateService';
 import { useAuth } from '@/app/providers/AuthContext';
 import { ArrowLeft } from 'lucide-react';
+import AlertMessageDialog from '@/shared/components/AlertMessageDialog';
 
 const levelLabels: Record<string, string> = {
     beginner: 'Principiante',
@@ -30,6 +31,9 @@ function CourseDetailPage() {
     const [exam, setExam] = useState(null);
     const { progress, setProgress } = useProgress(Number(id));
     const [generatingCertificate, setGeneratingCertificate] = useState(false);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+
 
     useEffect(() => {
         examService.getByCourse(Number(id))
@@ -53,9 +57,11 @@ function CourseDetailPage() {
         setGeneratingCertificate(true);
         try {
             const cert = await certificateService.generate(Number(id));
-            alert(`Certificado generado exitosamente: Codigo: ${cert.certificateCode}`);
+            setAlertMessage(`Certificado generado exitosamente: Código: ${cert.certificateCode}`);
+            setOpenAlert(true);
         } catch (error) {
-            alert('Error al generar certificado');
+            setAlertMessage('Error al generar certificado');
+            setOpenAlert(true);
         } finally {
             setGeneratingCertificate(false);
         }
@@ -68,10 +74,12 @@ function CourseDetailPage() {
                 p.lessonId === lessonId ? { ...p, completed: true } : p
             ))
             if (result.courseCompleted) {
-                alert('¡Felicidades! Completaste el curso')
+                setAlertMessage('¡Felicidades! Completaste el curso');
+                setOpenAlert(true);
             }
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al marcar lección')
+            setAlertMessage('Error al marcar la lección como completada');
+            setOpenAlert(true);
         }
     }
 
@@ -81,7 +89,8 @@ function CourseDetailPage() {
             await enrollmentService.enroll(Number(id));
             setIsEnrolled(true);
         } catch (error) {
-            alert('Error al inscribirse en el curso');
+            setAlertMessage('Error al inscribirse en el curso');
+            setOpenAlert(true);
         } finally {
             setEnrolling(false);
         }
@@ -192,6 +201,12 @@ function CourseDetailPage() {
                     </Card>
                 </div>
             </div >
+            <AlertMessageDialog
+                open={openAlert}
+                title="Aviso"
+                description={alertMessage}
+                onClose={() => setOpenAlert(false)}
+            />
         </>
     )
 }

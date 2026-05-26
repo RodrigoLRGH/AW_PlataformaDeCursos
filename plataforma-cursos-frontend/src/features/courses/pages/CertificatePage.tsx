@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import AlertMessageDialog from '@/shared/components/AlertMessageDialog';
 
 function CertificatePage() {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const { certificates, loading } = useCertificates();
     const [downloading, setDownloading] = useState<string | null>(null);
+    const [openAlert, setOpenAlert] = useState(false);
 
     const handleDownload = async (certId: string, courseTitle: string) => {
         setDownloading(certId);
@@ -25,7 +27,7 @@ function CertificatePage() {
             a.click();
             window.URL.revokeObjectURL(url);
         } catch (error) {
-            alert('Error al descargar certificado');
+            setOpenAlert(true);
         } finally {
             setDownloading(null);
         }
@@ -86,6 +88,12 @@ function CertificatePage() {
                     )}
                 </div>
             </div>
+            <AlertMessageDialog
+                open={openAlert}
+                title="Error al descargar certificado"
+                description="Hubo un error al intentar descargar el certificado. Por favor, inténtalo de nuevo."
+                onClose={() => setOpenAlert(false)}
+            />
         </>
     )
 }
