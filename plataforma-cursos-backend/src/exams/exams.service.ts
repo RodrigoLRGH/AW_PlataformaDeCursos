@@ -14,8 +14,6 @@ import { SubmitExamDto } from './dto/submit-exam.dto';
 import { Enrollment } from '../enrollments/entities/enrollment.entity';
 import { UpdateExamDto } from './dto/update-exam.dto';
 
-// Servicio de examenes
-// Gestiona la creacion, consulta y envio de resultados de examenes por curso
 @Injectable()
 export class ExamsService {
   constructor(
@@ -31,8 +29,6 @@ export class ExamsService {
     private readonly enrollmentRepo: Repository<Enrollment>,
   ) {}
 
-  // Crear un examen con sus preguntas para un curso
-  // Solo el creador del curso puede crear examenes
   async create(courseId: number, dto: CreateExamDto, userId: number) {
     const course = await this.courseRepo.findOne({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Curso no encontrado');
@@ -66,8 +62,6 @@ export class ExamsService {
     return this.findOne(savedExam.id);
   }
 
-  // Devuelve un examen por ID con sus preguntas
-  // Lanza NotFoundException si el examen no existe
   async findOne(id: string) {
     const exam = await this.examRepo.findOne({
       where: { id },
@@ -77,7 +71,6 @@ export class ExamsService {
     return exam;
   }
 
-  // Devuelve las preguntas de un examen sin exponer las respuestas correctas
   async getQuestionsForStudent(examId: string, userId: number) {
     const exam = await this.examRepo.findOne({
       where: { id: examId },
@@ -102,8 +95,6 @@ export class ExamsService {
     return questions.map(({ correctAnswer, ...q }) => q);
   }
 
-  // Procesa las respuestas de un estudiante y guarda el resultado
-  // Calcula el puntaje comparadno contra las respuestas correctas
   async submit(examId: string, userId: number, dto: SubmitExamDto) {
     const exam = await this.examRepo.findOne({
       where: { id: examId },
@@ -148,7 +139,6 @@ export class ExamsService {
     return this.resultRepo.save(result);
   }
 
-  // Devuelve los resultados de un usuario para un examen, ordenados por fecha descendente
   async getMyResults(userId: number, examId: string) {
     return this.resultRepo.find({
       where: { userId, examId },
@@ -156,15 +146,12 @@ export class ExamsService {
     });
   }
 
-  // Devuelve el examen de un curso, si existe
-
   async findByCourse(courseId: number) {
     return this.examRepo.findOne({
       where: { courseId },
     });
   }
 
-  // Devuelve el examen completo con preguntas (incluyendo correctAnswer) solo si el usuario es el creador del curso
   async getExamForCreator(examId: string, userId: number) {
     const exam = await this.examRepo.findOne({
       where: { id: examId },
@@ -178,8 +165,6 @@ export class ExamsService {
     return exam;
   }
 
-  // Actualizar un examen completo (incluyendo preguntas)
-  // Solo el creador del curso puede actualizar el examen
   async updateExam(examId: string, userId: number, dto: UpdateExamDto) {
     const exam = await this.examRepo.findOne({
       where: { id: examId },

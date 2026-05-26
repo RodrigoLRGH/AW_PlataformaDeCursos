@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards, Request} from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -8,14 +24,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 
-// Endpoint para gestion de cursos
 @ApiTags('Courses')
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  // GET /courses
-  // Devuelve los cursos publicados
   @Get()
   @ApiOperation({ summary: 'Listar cursos publicados' })
   @ApiResponse({ status: 200, description: 'Lista de cursos' })
@@ -23,8 +36,6 @@ export class CoursesController {
     return this.coursesService.findAll(true);
   }
 
-  // GET /courses/my 
-  // Devuelve los cursos creados por el creador autenticado, con sus lecciones
   @Get('my')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
@@ -34,8 +45,6 @@ export class CoursesController {
     return this.coursesService.findByCreator(req.user.sub);
   }
 
-  // GET /courses/:id
-  // Devuelve un curso por ID 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener curso por ID' })
   @ApiResponse({ status: 404, description: 'Curso no encontrado' })
@@ -43,8 +52,6 @@ export class CoursesController {
     return this.coursesService.findOne(id);
   }
 
-  // POST /courses
-  // Crea un curso, solo para usuarios con rol CREATOR
   @Post()
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
@@ -55,8 +62,6 @@ export class CoursesController {
     return this.coursesService.create(dto, req.user.sub);
   }
 
-  // PUT /courses/:id
-  // Actualiza un curso. Solo el creador del curso puede modificarlo
   @Put(':id')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)
@@ -70,8 +75,6 @@ export class CoursesController {
     return this.coursesService.update(id, dto, req.user.sub);
   }
 
-  // DELETE /courses/:id
-  // Elimina un curso. Solo el creador del curso puede eliminarlo
   @Delete(':id')
   @UseGuards(AccessTokenGuard, RolesGuard)
   @Roles(UserRole.CREATOR)

@@ -1,4 +1,14 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, PrimaryGeneratedColumn, Index, Unique } from 'typeorm';
+import {
+  Entity,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  PrimaryGeneratedColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
 
@@ -34,7 +44,6 @@ export class Enrollment {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  // Relaciones
   @ManyToOne(() => User, (user) => user.enrollments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

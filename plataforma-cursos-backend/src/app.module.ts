@@ -43,7 +43,6 @@ import { HealthModule } from './health/health.module';
     ForumsModule,
     HealthModule,
   ],
-  // ESTA ES LA PARTE QUE FALTA:
   providers: [
     {
       provide: APP_GUARD,
@@ -52,5 +51,3 @@ import { HealthModule } from './health/health.module';
   ],
 })
 export class AppModule {}
-
-//contra POSTGRES: TECATE

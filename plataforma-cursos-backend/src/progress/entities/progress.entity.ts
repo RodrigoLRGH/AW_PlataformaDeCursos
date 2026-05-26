@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Lesson } from '../../lessons/entities/lesson.entity';
 
@@ -23,7 +31,6 @@ export class Progress {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // Relaciones
   @ManyToOne(() => Lesson, (lesson) => lesson.progressRecords, {
     onDelete: 'CASCADE',
   })

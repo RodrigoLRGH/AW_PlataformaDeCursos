@@ -43,7 +43,6 @@ export class Lesson {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  // Relaciones
   @ManyToOne(() => Course, (course) => course.lessons, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_id' })
   course: Course;

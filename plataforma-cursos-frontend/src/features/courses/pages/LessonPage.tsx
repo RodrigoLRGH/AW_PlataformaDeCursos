@@ -52,7 +52,6 @@ function LessonPage() {
   const [confirmDeleteExamOpen, setConfirmDeleteExamOpen] = useState(false);
   const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
 
-  // Cargar todos los exámenes del creador (al montar el componente)
   useEffect(() => {
     examService
       .getMyExams()
@@ -67,7 +66,6 @@ function LessonPage() {
       .catch((err) => console.error("Error cargando exámenes", err));
   }, []);
 
-  // Cuando se selecciona un examen, cargar sus preguntas (para ver)
   useEffect(() => {
     if (selectedExam && selectedExam.id && selectedExam.id !== "my") {
       examService
@@ -172,7 +170,6 @@ function LessonPage() {
         </nav>
 
         <div className="max-w-4xl mx-auto px-8 py-10">
-          {/* Cabecera con título y botones principales */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold">{course?.title}</h2>
@@ -195,7 +192,6 @@ function LessonPage() {
             </div>
           </div>
 
-          {/* Selector de todos los exámenes del creador */}
           {allExams.length > 0 && (
             <div className="mb-6 p-4 border rounded-lg bg-muted/20">
               <h3 className="text-sm font-semibold mb-2">
@@ -255,7 +251,6 @@ function LessonPage() {
             </div>
           )}
 
-          {/* Mensaje cuando no hay exámenes */}
           {allExams.length === 0 && (
             <div className="mb-6 p-4 border rounded-lg bg-muted/20 text-center text-muted-foreground">
               No tienes exámenes creados en ningún curso. Crea uno usando "Nuevo
@@ -263,7 +258,6 @@ function LessonPage() {
             </div>
           )}
 
-          {/* Formulario de lección */}
           {showForm && (
             <LessonForm
               editingLesson={editingLesson ?? undefined}
@@ -276,7 +270,6 @@ function LessonPage() {
             />
           )}
 
-          {/* Lista de lecciones */}
           {loading ? (
             <p className="text-muted-foreground">Cargando...</p>
           ) : lessons.length === 0 ? (
@@ -303,7 +296,6 @@ function LessonPage() {
         </div>
       </div>
 
-      {/* Modal para ver el examen seleccionado */}
       <Dialog open={showExamModal} onOpenChange={setShowExamModal}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>

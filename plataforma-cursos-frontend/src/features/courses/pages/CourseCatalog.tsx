@@ -22,7 +22,6 @@ function CourseCatalog() {
   const [level, setLevel] = useState("");
   const navigate = useNavigate();
 
-  // Obtener lista única de categorías de los cursos
   const categories = useMemo(() => {
     const cats = new Set(courses.map((c) => c.category).filter(Boolean));
     return Array.from(cats) as string[];
@@ -73,7 +72,6 @@ function CourseCatalog() {
             className="flex-1 min-w-48"
           />
 
-          {/* Select para nivel - independiente */}
           <Select
             value={level}
             onValueChange={(val) => setLevel(val === "all" ? "" : val)}
@@ -89,7 +87,6 @@ function CourseCatalog() {
             </SelectContent>
           </Select>
 
-          {/* Select para categoría - independiente */}
           <Select
             value={category}
             onValueChange={(val) => setCategory(val === "all" ? "" : val)}

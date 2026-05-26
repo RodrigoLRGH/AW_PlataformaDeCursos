@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Exam } from './exam.entity';
 
@@ -27,7 +34,6 @@ export class ExamQuestion {
   @Column({ type: 'int', default: 1 })
   points: number;
 
-  // Relaciones
   @ManyToOne(() => Exam, (exam) => exam.questions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'exam_id' })
   exam: Exam;

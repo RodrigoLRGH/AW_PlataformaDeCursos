@@ -68,7 +68,6 @@ export class Course {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // Relaciones
   @ManyToOne(() => User, (user) => user.courses, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'creator_id' })
   creator!: User;

@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Enrollment } from './entities/enrollment.entity';
@@ -10,15 +15,14 @@ export class EnrollmentsService {
     @InjectRepository(Enrollment)
     private enrollmentRepo: Repository<Enrollment>,
     @InjectRepository(Course) private courseRepo: Repository<Course>,
-  ) { }
+  ) {}
 
-  // Inscribirse a un curso
   async enroll(userId: number, courseId: number) {
     const course = await this.courseRepo.findOne({ where: { id: courseId } });
     if (!course) throw new NotFoundException('Curso no encontrado');
 
     if (course.creatorId === userId) {
-      throw new ForbiddenException('No puedes inscribirte en tu propio curso')
+      throw new ForbiddenException('No puedes inscribirte en tu propio curso');
     }
 
     const existing = await this.enrollmentRepo.findOne({
@@ -31,7 +35,6 @@ export class EnrollmentsService {
     return this.enrollmentRepo.save(enrollment);
   }
 
-  // Obtener mis inscripciones con los datos del curso y su creador
   async findMyEnrollments(userId: number) {
     return this.enrollmentRepo.find({
       where: { userId },
@@ -50,7 +53,6 @@ export class EnrollmentsService {
     });
   }
 
-  // Verificar si estoy inscrito en un curso específico
   async findOne(userId: number, courseId: number) {
     const enrollment = await this.enrollmentRepo.findOne({
       where: { userId, courseId },

@@ -6,8 +6,6 @@ import {
   type ExamResult,
 } from "../services/examService";
 
-// Devuelve el examen asociado a un curso.
-
 export function useExamByCourse(courseId: number) {
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,8 +22,6 @@ export function useExamByCourse(courseId: number) {
 
   return { exam, loading, error };
 }
-
-// Devuelve las preguntas de un examen sin las respuestas correctas.
 
 export function useExamQuestions(examId: string) {
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
@@ -44,8 +40,6 @@ export function useExamQuestions(examId: string) {
   return { questions, loading, error };
 }
 
-// Devuelve los resultados del usuario autenticado para un examen.
-
 export function useExamResults(examId: string) {
   const [results, setResults] = useState<ExamResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +57,6 @@ export function useExamResults(examId: string) {
   return { results, loading, error };
 }
 
-// Devuelve el examen completo (con respuestas correctas) - solo para creador
 export function useExam(examId: string) {
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);

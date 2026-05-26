@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, Index, } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { Course } from '../../courses/entities/course.entity';
 import { ExamQuestion } from './exam-question.entity';
 import { ExamResult } from './exam-result.entity';
@@ -33,7 +43,6 @@ export class Exam {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  // Relaciones
   @ManyToOne(() => Course, (course) => course.exams, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'course_id' })
   course: Course;

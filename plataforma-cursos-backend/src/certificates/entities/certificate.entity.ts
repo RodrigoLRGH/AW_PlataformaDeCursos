@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { ExamResult } from '../../exams/entities/exam-result.entity';
 import { Course } from '../../courses/entities/course.entity';
@@ -18,7 +26,7 @@ export class Certificate {
   courseId: number;
 
   @Column({ name: 'exam_result_id', unique: true, nullable: true })
-  examResultId: number
+  examResultId: number;
 
   @Column({ name: 'certificate_code', unique: true })
   certificateCode: string;
@@ -29,7 +37,6 @@ export class Certificate {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  // Relaciones
   @ManyToOne(() => User, (user) => user.certificates, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

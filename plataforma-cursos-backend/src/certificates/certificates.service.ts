@@ -19,7 +19,6 @@ export class CertificatesService {
     private enrollmentRepo: Repository<Enrollment>,
   ) {}
 
-  // Generar certificado al completar un curso
   async generate(userId: number, courseId: number) {
     const enrollment = await this.enrollmentRepo.findOne({
       where: { userId: Number(userId), courseId: Number(courseId) } as any,
@@ -50,7 +49,6 @@ export class CertificatesService {
     return this.certRepo.save(cert);
   }
 
-  // Obtener mis certificados
   async getMyCertificates(userId: number) {
     return this.certRepo.find({
       where: { userId: Number(userId) } as any,
@@ -58,7 +56,6 @@ export class CertificatesService {
     });
   }
 
-  // Descargar certificado en PDF, verifica que el certificado exista y que el usuario sea el dueño antes de generar el PDF
   async downloadPdf(certId: string, userId: number): Promise<Buffer> {
     const cert = await this.certRepo.findOne({
       where: { id: certId },

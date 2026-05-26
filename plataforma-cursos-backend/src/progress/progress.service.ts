@@ -1,4 +1,8 @@
-﻿import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+﻿import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { Progress } from './entities/progress.entity';
@@ -13,9 +17,8 @@ export class ProgressService {
     private enrollmentRepo: Repository<Enrollment>,
     @InjectRepository(Lesson) private lessonRepo: Repository<Lesson>,
     private dataSource: DataSource,
-  ) { }
+  ) {}
 
-  // Marcar una lección como completada, actualiza el progreso del curso y marca el curso como completado si se han completado todas las lecciones
   async markLessonCompleted(userId: number, lessonId: string) {
     return this.dataSource.transaction(async (manager) => {
       const lesson = await manager.findOne(Lesson, {

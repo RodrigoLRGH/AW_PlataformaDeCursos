@@ -109,7 +109,6 @@ function ThreadDetailPage() {
               </p>
             ) : (
               <div className="space-y-4">
-                // Dentro del map de replies
                 {thread.replies?.map((reply) => (
                   <Card key={reply.id}>
                     <CardHeader className="flex justify-start items-start">

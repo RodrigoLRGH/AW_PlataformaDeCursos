@@ -11,20 +11,17 @@ export class ForumsService {
   constructor(
     @InjectRepository(ForumThread) private threadRepo: Repository<ForumThread>,
     @InjectRepository(ForumReply) private replyRepo: Repository<ForumReply>,
-  ) { }
+  ) {}
 
-  // Obtener threads de un curso específico
   async getThreadsByCourse(courseId: string) {
     return this.threadRepo.find({
       where: { courseId },
       relations: ['author'],
       order: { createdAt: 'DESC' },
-    })
+    });
   }
 
-  // Obtener un thread específico con sus replies
-  async getThread(id: string
-  ) {
+  async getThread(id: string) {
     const thread = await this.threadRepo.findOne({
       where: { id },
       relations: ['author', 'replies', 'replies.author'],
@@ -33,9 +30,7 @@ export class ForumsService {
     return thread;
   }
 
-  // Crear thread, protegido por la estrategia de access token
-  async createThread(dto: CreateThreadDto, authorId: number
-  ) {
+  async createThread(dto: CreateThreadDto, authorId: number) {
     const threadData: DeepPartial<ForumThread> = {
       title: dto.title,
       body: dto.body,
@@ -47,10 +42,7 @@ export class ForumsService {
     return this.threadRepo.save(thread);
   }
 
-  // Responder a un thread, protegido por la estrategia de access token
-  async createReply(threadId: string
-    , dto: CreateReplyDto, authorId: number
-  ) {
+  async createReply(threadId: string, dto: CreateReplyDto, authorId: number) {
     const thread = await this.threadRepo.findOne({
       where: { id: threadId.toString() },
     });
