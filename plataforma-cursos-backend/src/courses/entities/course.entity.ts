@@ -14,6 +14,7 @@ import { Lesson } from '../../lessons/entities/lesson.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 import { Exam } from '../../exams/entities/exam.entity';
 import { ForumThread } from '../../forums/entities/forum-thread.entity';
+import { Certificate } from '../../certificates/entities/certificate.entity';
 
 export enum CourseStatus {
   DRAFT = 'draft',
@@ -86,4 +87,9 @@ export class Course {
 
   @OneToMany(() => ForumThread, (thread: ForumThread) => thread.course)
   forumThreads!: ForumThread[];
+
+  @OneToMany(() => Certificate, (certificate) => certificate.course, {
+  cascade: true,
+  })
+  certificates!: Certificate[];
 }

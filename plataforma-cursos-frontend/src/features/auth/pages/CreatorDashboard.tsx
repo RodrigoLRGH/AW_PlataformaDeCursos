@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { useMyCourses } from '@/features/courses/hooks/useCourses.hook'
 import { CircleUser, Plus } from 'lucide-react'
 import { useState } from 'react'
+import { useTheme } from '@/hooks/useTheme'
+import { Sun, Moon } from 'lucide-react'
 import ConfirmDialog from '../../../shared/components/ConfirmDialog'
 
 function CreatorDashboard() {
@@ -15,6 +17,7 @@ function CreatorDashboard() {
   const { courses, setCourses, loading } = useMyCourses()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [courseToDelete, setCourseToDelete] = useState<number | null>(null)
+  const { isDark, toggleTheme } = useTheme()
 
   const handleDelete = async (id: number) => {
     setCourseToDelete(id)
@@ -31,13 +34,16 @@ function CreatorDashboard() {
 
   return (
     <>
-      <div className="min-h-screen bg-muted/40">
-        <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-primary">Panel del creador</h1>
+      <div className="min-h-screen bg-fondo">
+        <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-primario">Panel del creador</h1>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
             <CircleUser />
-            <span className="text-sm text-muted-foreground">{user?.firstName} {user?.lastName}</span>
-            <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
+            <span className="text-sm text-secundario">{user?.firstName} {user?.lastName}</span>
+            <Button variant="destructive" size="sm" onClick={logout}>
               Cerrar sesión
             </Button>
           </div>
@@ -45,19 +51,19 @@ function CreatorDashboard() {
         <div className="max-w-5xl mx-auto px-8 py-10">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-2xl font-bold">Mis cursos</h2>
-              <p className="text-muted-foreground">Gestiona tus cursos publicados y borradores</p>
+              <h2 className="text-2xl font-bold text-primario">Mis cursos</h2>
+              <p className="text-secundario">Gestiona tus cursos publicados y borradores</p>
             </div>
             <Button onClick={() => navigate('/creator/courses/new')} className="hover:cursor-pointer">
               <Plus />Nuevo curso
             </Button>
           </div>
           {loading ? (
-            <p className="text-muted-foreground">Cargando...</p>
+            <p className="text-secundario">Cargando...</p>
           ) : courses.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground mb-4">No tienes cursos todavía.</p>
+                <p className="text-secundario mb-4">No tienes cursos todavía.</p>
                 <Button onClick={() => navigate('/creator/courses/new')} className="hover:cursor-pointer">
                   Crear mi primer curso
                 </Button>
@@ -71,7 +77,7 @@ function CreatorDashboard() {
                     <div className="flex items-center gap-3">
                       <div>
                         <CardTitle className="text-lg">{course.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">{course.description}</p>
+                        <p className="text-sm text-secundario mt-1">{course.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -82,13 +88,13 @@ function CreatorDashboard() {
                         onClick={() => navigate(`/creator/courses/${course.id}/edit`)}>
                         Editar
                       </Button>
-                      <Button variant="destructive" size="sm"
-                        onClick={() => handleDelete(course.id)}>
-                        Eliminar
-                      </Button>
                       <Button variant="outline" size="sm"
                         onClick={() => navigate(`/creator/courses/${course.id}/lessons`)}>
                         Lecciones
+                      </Button>
+                      <Button variant="destructive" size="sm"
+                        onClick={() => handleDelete(course.id)}>
+                        Eliminar
                       </Button>
                     </div>
                   </CardHeader>
