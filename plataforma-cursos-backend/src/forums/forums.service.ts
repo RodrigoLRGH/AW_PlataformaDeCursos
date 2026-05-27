@@ -38,8 +38,14 @@ export class ForumsService {
       authorId: authorId,
     };
 
-    const thread = this.threadRepo.create(threadData);
-    return this.threadRepo.save(thread);
+    const savedThread = await this.threadRepo.save(
+      this.threadRepo.create(threadData),
+    );
+
+    return this.threadRepo.findOne({
+      where: { id: savedThread.id },
+      relations: ['author'],
+    });
   }
 
   async createReply(threadId: string, dto: CreateReplyDto, authorId: number) {
@@ -55,7 +61,13 @@ export class ForumsService {
       authorId: authorId,
     };
 
-    const reply = this.replyRepo.create(replyData);
-    return this.replyRepo.save(reply);
+    const savedReply = await this.replyRepo.save(
+      this.replyRepo.create(replyData),
+    );
+
+    return await this.replyRepo.findOne({
+      where: { id: savedReply.id },
+      relations: ['author'],
+    });
   }
 }

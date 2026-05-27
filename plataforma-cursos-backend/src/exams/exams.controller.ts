@@ -11,6 +11,8 @@
   UseInterceptors,
   Delete,
   Query,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,6 +27,7 @@ import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
+import { UpdateExamDto } from './dto/update-exam.dto';
 
 @ApiTags('Exams')
 @UseGuards(AccessTokenGuard)
@@ -86,23 +89,19 @@ export class ExamsController {
     return this.examsService.getMyResults(req.user.sub, id);
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.CREATOR)
-  @ApiOperation({ summary: 'Eliminar examen' })
-  remove(@Param('id') id: string, @Request() req) {
-    return this.examsService.remove(id, req.user.sub);
-  }
-
   @Get(':id')
-  @ApiOperation({
-    summary:
-      'Obtener examen completo (con preguntas y respuestas correctas) – solo para creador',
-  })
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.CREATOR)
+  @ApiOperation({ summary: 'Obtener examen por ID' })
   async findOne(@Param('id') id: string, @Request() req) {
-    return this.examsService.findOneForCreator(id, req.user.sub);
+    const userId = req.user?.sub;
+    if (!userId) throw new UnauthorizedException('Usuario no autenticado');
+
+    const userRole = req.user?.role;
+
+    if (userRole === UserRole.CREATOR) {
+      return this.examsService.findOneForCreator(id, userId);
+    }
+
+    return this.examsService.findOne(id);
   }
 
   @Put(':id')
@@ -111,9 +110,18 @@ export class ExamsController {
   @ApiOperation({ summary: 'Actualizar examen existente (incluye preguntas)' })
   async update(
     @Param('id') id: string,
-    @Body() dto: CreateExamDto,
-    @Request() req,
+    @Body() dto: UpdateExamDto,
+    @Req() req,
   ) {
-    return this.examsService.update(id, dto, req.user.sub);
+    const userId = req.user.sub;
+    return this.examsService.update(id, dto, userId);
+  }
+
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CREATOR)
+  @ApiOperation({ summary: 'Eliminar examen' })
+  remove(@Param('id') id: string, @Request() req) {
+    return this.examsService.remove(id, req.user.sub);
   }
 }

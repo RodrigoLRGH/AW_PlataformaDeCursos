@@ -58,9 +58,20 @@ function EditExamPage() {
           ]);
         }
       })
-      .catch(() => setError("No se pudo cargar el examen"))
+
+      .catch((err) => {
+        if (err.response?.status === 403 || err.response?.status === 400) {
+          setError("No tienes permiso para editar este examen");
+          setTimeout(
+            () => navigate(`/creator/courses/${courseId}/lessons`),
+            2000,
+          );
+        } else {
+          setError("No se pudo cargar el examen");
+        }
+      })
       .finally(() => setLoading(false));
-  }, [examId]);
+  }, [examId, courseId, navigate]);
 
   const addQuestion = () => {
     setQuestions([
@@ -95,12 +106,29 @@ function EditExamPage() {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim()) return setError("El título es requerido");
-    if (questions.length === 0)
-      return setError("Debes agregar al menos una pregunta");
+    if (!title.trim()) {
+      setError("El título es requerido");
+      return;
+    }
+    if (questions.length === 0) {
+      setError("Debes agregar al menos una pregunta");
+      return;
+    }
 
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
+      if (!q.question.trim()) {
+        setError(`La pregunta ${i + 1} no puede estar vacía`);
+        return;
+      }
+      for (let j = 0; j < q.options.length; j++) {
+        if (!q.options[j].trim()) {
+          setError(
+            `La opción ${j + 1} de la pregunta ${i + 1} no puede estar vacía`,
+          );
+          return;
+        }
+      }
       if (
         typeof q.correctAnswer !== "number" ||
         q.correctAnswer < 0 ||
@@ -120,6 +148,7 @@ function EditExamPage() {
       title: title.trim(),
       passingScore: Number(passingScore),
       questions: questions.map((q, i) => ({
+        id: q.id || undefined,
         question: q.question.trim(),
         options: q.options.map((opt) => opt.trim()),
         correctAnswer: q.correctAnswer,
@@ -138,7 +167,7 @@ function EditExamPage() {
           "Revisa que hayas seleccionado la respuesta correcta en todas las preguntas",
         );
       } else {
-        setError("Error al crear el examen. Inténtalo de nuevo.");
+        setError("Error al actualizar el examen. Inténtalo de nuevo.");
       }
     } finally {
       setSubmitting(false);

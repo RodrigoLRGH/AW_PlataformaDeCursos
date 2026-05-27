@@ -7,7 +7,6 @@ export interface ExamQuestion {
   order: number;
   points: number;
 }
-
 export interface ExamQuestionWithAnswer extends ExamQuestion {
   correctAnswer: number;
 }
@@ -35,6 +34,7 @@ export interface CreateExamPayload {
   passingScore?: number;
   timeLimitMinutes?: number;
   questions: {
+    id?: string;
     question: string;
     options: string[];
     points: number;

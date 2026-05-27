@@ -26,7 +26,15 @@ export class ExamResult {
   @Column({ name: 'exam_id' })
   examId: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   score: number;
 
   @Column({ name: 'is_passed' })
@@ -50,4 +58,17 @@ export class ExamResult {
   exam: Exam;
 
   certificate: Certificate;
+
+  @Column({
+    name: 'passing_score',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 70.0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value), // ← mismo problema
+    },
+  })
+  passingScore: number;
 }

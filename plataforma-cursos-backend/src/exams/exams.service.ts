@@ -11,6 +11,7 @@ import { ExamResult } from './entities/exam-result.entity';
 import { Course } from '../courses/entities/course.entity';
 import { CreateExamDto } from './dto/create-exam.dto';
 import { SubmitExamDto } from './dto/submit-exam.dto';
+import { UpdateExamDto } from './dto/update-exam.dto';
 
 @Injectable()
 export class ExamsService {
@@ -158,54 +159,66 @@ export class ExamsService {
   }
 
   async findOneForCreator(id: string, userId: number) {
+    if (!userId) {
+      throw new ForbiddenException('No se identificó al usuario');
+    }
     const exam = await this.examRepo.findOne({
       where: { id },
       relations: ['questions', 'course'],
     });
     if (!exam) throw new NotFoundException('Examen no encontrado');
-
     if (Number(exam.course.creatorId) !== Number(userId)) {
       throw new ForbiddenException('No tienes permiso para ver este examen');
     }
-
     return exam;
   }
 
-  async update(id: string, dto: CreateExamDto, userId: number) {
+  async update(id: string, dto: UpdateExamDto, userId: number) {
     const exam = await this.examRepo.findOne({
       where: { id },
-      relations: ['course', 'questions'],
+      relations: ['course'],
     });
     if (!exam) throw new NotFoundException('Examen no encontrado');
-
     if (Number(exam.course.creatorId) !== Number(userId)) {
-      throw new ForbiddenException('No autorizado para modificar este examen');
+      throw new ForbiddenException('No autorizado para editar este examen');
     }
+    // Actualizar campos básicos
+    if (dto.title) exam.title = dto.title;
+    if (dto.passingScore) exam.passingScore = dto.passingScore;
 
-    exam.title = dto.title;
-    exam.passingScore = dto.passingScore ?? exam.passingScore;
-    exam.timeLimitMinutes = dto.timeLimitMinutes ?? exam.timeLimitMinutes;
+    const queryRunner = this.examRepo.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (dto.questions) {
-      if (exam.questions?.length) {
-        await this.questionRepo.remove(exam.questions);
+    try {
+      // 1. Eliminar todas las preguntas antiguas
+      await queryRunner.manager.delete(ExamQuestion, { examId: exam.id });
+
+      // 2. Crear las nuevas preguntas
+      if (dto.questions?.length) {
+        const newQuestions = dto.questions.map((q, idx) =>
+          this.questionRepo.create({
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            points: q.points,
+            order: q.order ?? idx,
+            examId: exam.id,
+          }),
+        );
+        await queryRunner.manager.save(newQuestions);
       }
 
-      const newQuestions = dto.questions.map((q, index) =>
-        this.questionRepo.create({
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-          order: q.order ?? index + 1,
-          points: q.points ?? 1,
-          examId: exam.id,
-        }),
-      );
-      await this.questionRepo.save(newQuestions);
+      // 3. Guardar cambios del examen
+      await queryRunner.manager.save(exam);
+      await queryRunner.commitTransaction();
+
+      return this.findOne(id); // Retorna el examen con preguntas actualizadas
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const savedExam = await this.examRepo.save(exam);
-
-    return this.findOneForCreator(savedExam.id, userId);
   }
 }
