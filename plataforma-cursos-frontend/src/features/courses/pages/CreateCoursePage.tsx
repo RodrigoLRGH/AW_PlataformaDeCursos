@@ -1,129 +1,198 @@
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router';
-import { courseService } from '../services/courseService';
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/app/providers/AuthContext';
-import { ArrowLeft, X } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme'
-import { Sun, Moon } from 'lucide-react'
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
+import { courseService } from "../services/courseService";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/app/providers/AuthContext";
+import { ArrowLeft, X } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
+import { Sun, Moon } from "lucide-react";
 
 const schema = z.object({
-    title: z.string().min(3, 'Minimo 3 caracteres').max(70, 'Maximo 70 caracteres'),
-    description: z.string().max(90, 'Maximo 90 caracteres').optional(),
-    thumbnailUrl: z.string().url('URL invalida').optional().or(z.literal('')),
-    price: z.number().min(0, 'El precio no puede ser negativo'),
-    category: z.string().max(25, 'Maximo 25 caracteres').optional(),
-    level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
+  title: z
+    .string()
+    .min(3, "Minimo 3 caracteres")
+    .max(70, "Maximo 70 caracteres"),
+  description: z.string().max(1000, "Maximo 1000 caracteres").optional(),
+  thumbnailUrl: z.string().url("URL invalida").optional().or(z.literal("")),
+  price: z.number().min(1, "El precio debe ser al menos 1"),
+  category: z.string().max(25, "Maximo 25 caracteres").optional(),
+  level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
 });
 
 type CreateCourseFormData = z.infer<typeof schema>;
 
 export function CreateCoursePage() {
-    const navigate = useNavigate();
-    const { logout } = useAuth();
-    const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, setError } = useForm<CreateCourseFormData>({
-        resolver: zodResolver(schema),
-    });
-    const { isDark, toggleTheme } = useTheme()
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<CreateCourseFormData>({
+    resolver: zodResolver(schema),
+  });
+  const { isDark, toggleTheme } = useTheme();
 
-    const onSubmit = async (data: CreateCourseFormData) => {
-        try {
-            await courseService.create(data);
-            navigate('/creator-dashboard');
-        } catch (error) {
-            setError('root', { message: 'Error al crear curso' });
-        }
-    };
+  const onSubmit = async (data: CreateCourseFormData) => {
+    try {
+      await courseService.create(data);
+      navigate("/creator-dashboard");
+    } catch (error) {
+      setError("root", { message: "Error al crear curso" });
+    }
+  };
 
-    return (
-        <>
-            <div className="min-h-screen bg-fondo">
-                <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
-                    <div className="flex flex-1">
-                        <Button size="sm" onClick={() => navigate('/creator-dashboard')}>
-                            <ArrowLeft size={16} /> Volver
-                        </Button>
-                    </div>
+  return (
+    <>
+      <div className="min-h-screen bg-fondo">
+        <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
+          <div className="flex flex-1">
+            <Button size="sm" onClick={() => navigate("/creator-dashboard")}>
+              <ArrowLeft size={16} /> Volver
+            </Button>
+          </div>
 
-                    <h1 className="text-xl font-bold text-primario">Nuevo curso</h1>
+          <h1 className="text-xl font-bold text-primario">Nuevo curso</h1>
 
-                    <div className="flex flex-1 justify-end items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={logout}>
-                            Cerrar sesion
-                        </Button>
-                    </div>
-                </nav>
-                <div className="max-w-2xl mx-auto px-8 py-10">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Informacion del curso</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                <div className="space-y-1">
-                                    <Label htmlFor="title">Titulo</Label>
-                                    <Input id="title" placeholder="Nombre del curso" {...register('title')} />
-                                    {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="description">Descripcion</Label>
-                                    <Textarea id="description" rows={4} placeholder="Describe tu curso..." {...register('description')} />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="thumbnailUrl">URL de portada</Label>
-                                    <Input id="thumbnailUrl" placeholder="https://..." {...register('thumbnailUrl')} />
-                                    {errors.thumbnailUrl && <p className="text-destructive text-sm">{errors.thumbnailUrl.message}</p>}
-                                </div>
-                                <div className="flex gap-4">
-                                    <div className="space-y-1 flex-1">
-                                        <Label htmlFor="category">Categoría</Label>
-                                        <Input id="category" placeholder="ej. Programación" {...register('category')} />
-                                    </div>
-                                    <div className="space-y-1 flex-1">
-                                        <Label>Nivel</Label>
-                                        <Select onValueChange={(val) => setValue('level', val as 'beginner' | 'intermediate' | 'advanced')}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Seleccionar nivel" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="beginner">Principiante</SelectItem>
-                                                <SelectItem value="intermediate">Intermedio</SelectItem>
-                                                <SelectItem value="advanced">Avanzado</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="price">Precio (MXN)</Label>
-                                    <Input id="price" type="number" min="0" placeholder="0.00" {...register('price', { valueAsNumber: true })} />
-                                    {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
-                                </div>
-                                <div className="flex gap-3 pt-2">
-                                    <Button type="button" variant="outline" className="flex-1"
-                                        onClick={() => navigate('/creator-dashboard')}>
-                                        <X size={16} /> Cancelar
-                                    </Button>
-                                    <Button type="submit" className="flex-1" disabled={isSubmitting} >
-                                        {isSubmitting ? 'Guardando...' : 'Crear curso'}
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
+          <div className="flex flex-1 justify-end items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              {isDark ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+            <Button variant="destructive" size="sm" onClick={logout}>
+              Cerrar sesion
+            </Button>
+          </div>
+        </nav>
+        <div className="max-w-2xl mx-auto px-8 py-10">
+          <Card>
+            <CardHeader>
+              <CardTitle>Informacion del curso</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-1">
+                  <Label htmlFor="title">Titulo</Label>
+                  <Input
+                    id="title"
+                    placeholder="Nombre del curso"
+                    {...register("title")}
+                  />
+                  {errors.title && (
+                    <p className="text-destructive text-sm">
+                      {errors.title.message}
+                    </p>
+                  )}
                 </div>
-            </div>
-        </>
-    )
+                <div className="space-y-1">
+                  <Label htmlFor="description">Descripcion</Label>
+                  <Textarea
+                    id="description"
+                    rows={4}
+                    placeholder="Describe tu curso..."
+                    {...register("description")}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="thumbnailUrl">URL de portada</Label>
+                  <Input
+                    id="thumbnailUrl"
+                    placeholder="https://..."
+                    {...register("thumbnailUrl")}
+                  />
+                  {errors.thumbnailUrl && (
+                    <p className="text-destructive text-sm">
+                      {errors.thumbnailUrl.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <div className="space-y-1 flex-1">
+                    <Label htmlFor="category">Categoría</Label>
+                    <Input
+                      id="category"
+                      placeholder="ej. Programación"
+                      {...register("category")}
+                    />
+                  </div>
+                  <div className="space-y-1 flex-1">
+                    <Label>Nivel</Label>
+                    <Select
+                      onValueChange={(val) =>
+                        setValue(
+                          "level",
+                          val as "beginner" | "intermediate" | "advanced",
+                        )
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar nivel" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="beginner">Principiante</SelectItem>
+                        <SelectItem value="intermediate">Intermedio</SelectItem>
+                        <SelectItem value="advanced">Avanzado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="price">Precio (MXN)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    min="0"
+                    placeholder="0.00"
+                    {...register("price", { valueAsNumber: true })}
+                  />
+                  {errors.price && (
+                    <p className="text-destructive text-sm">
+                      {errors.price.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => navigate("/creator-dashboard")}
+                  >
+                    <X size={16} /> Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Guardando..." : "Crear curso"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default CreateCoursePage;

@@ -6,6 +6,8 @@ import {
   Min,
   MaxLength,
   Max,
+  IsUrl,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -18,17 +20,17 @@ export class CreateCourseDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  @MaxLength(90)
+  @MaxLength(1000)
   description?: string;
 
-  @ApiProperty({ required: false })
-  @IsString()
+  @ValidateIf((o) => o.thumbnailUrl !== undefined && o.thumbnailUrl !== '')
+  @IsUrl()
   @IsOptional()
   thumbnailUrl?: string;
 
-  @ApiProperty({ default: 0 })
+  @ApiProperty({ default: 1 })
   @IsNumber()
-  @Min(0)
+  @Min(1)
   @IsOptional()
   price?: number;
 

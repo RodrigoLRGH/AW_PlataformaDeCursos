@@ -156,4 +156,56 @@ export class ExamsService {
 
     return queryBuilder.getMany();
   }
+
+  async findOneForCreator(id: string, userId: number) {
+    const exam = await this.examRepo.findOne({
+      where: { id },
+      relations: ['questions', 'course'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+
+    if (Number(exam.course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No tienes permiso para ver este examen');
+    }
+
+    return exam;
+  }
+
+  async update(id: string, dto: CreateExamDto, userId: number) {
+    const exam = await this.examRepo.findOne({
+      where: { id },
+      relations: ['course', 'questions'],
+    });
+    if (!exam) throw new NotFoundException('Examen no encontrado');
+
+    if (Number(exam.course.creatorId) !== Number(userId)) {
+      throw new ForbiddenException('No autorizado para modificar este examen');
+    }
+
+    exam.title = dto.title;
+    exam.passingScore = dto.passingScore ?? exam.passingScore;
+    exam.timeLimitMinutes = dto.timeLimitMinutes ?? exam.timeLimitMinutes;
+
+    if (dto.questions) {
+      if (exam.questions?.length) {
+        await this.questionRepo.remove(exam.questions);
+      }
+
+      const newQuestions = dto.questions.map((q, index) =>
+        this.questionRepo.create({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          order: q.order ?? index + 1,
+          points: q.points ?? 1,
+          examId: exam.id,
+        }),
+      );
+      await this.questionRepo.save(newQuestions);
+    }
+
+    const savedExam = await this.examRepo.save(exam);
+
+    return this.findOneForCreator(savedExam.id, userId);
+  }
 }

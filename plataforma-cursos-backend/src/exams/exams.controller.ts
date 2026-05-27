@@ -93,4 +93,27 @@ export class ExamsController {
   remove(@Param('id') id: string, @Request() req) {
     return this.examsService.remove(id, req.user.sub);
   }
+
+  @Get(':id')
+  @ApiOperation({
+    summary:
+      'Obtener examen completo (con preguntas y respuestas correctas) – solo para creador',
+  })
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CREATOR)
+  async findOne(@Param('id') id: string, @Request() req) {
+    return this.examsService.findOneForCreator(id, req.user.sub);
+  }
+
+  @Put(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.CREATOR)
+  @ApiOperation({ summary: 'Actualizar examen existente (incluye preguntas)' })
+  async update(
+    @Param('id') id: string,
+    @Body() dto: CreateExamDto,
+    @Request() req,
+  ) {
+    return this.examsService.update(id, dto, req.user.sub);
+  }
 }
