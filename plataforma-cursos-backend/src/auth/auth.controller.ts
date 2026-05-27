@@ -76,7 +76,6 @@ export class AuthController {
     return { message: 'Tokens renovados' };
   }
 
-  // Cierre de sesión que borra las cookies de tokens
   @Post('logout')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)

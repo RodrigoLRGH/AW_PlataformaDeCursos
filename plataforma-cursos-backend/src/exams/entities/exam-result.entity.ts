@@ -67,7 +67,7 @@ export class ExamResult {
     default: 70.0,
     transformer: {
       to: (value: number) => value,
-      from: (value: string) => parseFloat(value), // ← mismo problema
+      from: (value: string) => parseFloat(value),
     },
   })
   passingScore: number;

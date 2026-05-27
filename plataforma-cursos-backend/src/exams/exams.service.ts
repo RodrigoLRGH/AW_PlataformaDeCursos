@@ -182,7 +182,6 @@ export class ExamsService {
     if (Number(exam.course.creatorId) !== Number(userId)) {
       throw new ForbiddenException('No autorizado para editar este examen');
     }
-    // Actualizar campos básicos
     if (dto.title) exam.title = dto.title;
     if (dto.passingScore) exam.passingScore = dto.passingScore;
 
@@ -191,10 +190,8 @@ export class ExamsService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Eliminar todas las preguntas antiguas
       await queryRunner.manager.delete(ExamQuestion, { examId: exam.id });
 
-      // 2. Crear las nuevas preguntas
       if (dto.questions?.length) {
         const newQuestions = dto.questions.map((q, idx) =>
           this.questionRepo.create({
@@ -209,11 +206,10 @@ export class ExamsService {
         await queryRunner.manager.save(newQuestions);
       }
 
-      // 3. Guardar cambios del examen
       await queryRunner.manager.save(exam);
       await queryRunner.commitTransaction();
 
-      return this.findOne(id); // Retorna el examen con preguntas actualizadas
+      return this.findOne(id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

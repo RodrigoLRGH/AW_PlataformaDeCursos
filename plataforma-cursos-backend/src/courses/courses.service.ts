@@ -52,9 +52,6 @@ export class CoursesService {
       throw new ForbiddenException('No autorizado para eliminar este curso');
     }
 
-    // const updatedCourse = await this.courseRepo.preload({ id, ...dto });
-    // if (!updatedCourse) throw new NotFoundException('Curso no encontrado');
-    // return this.courseRepo.save(updatedCourse);
     const updatedCourse = await this.courseRepo.preload({ id, ...dto });
     if (!updatedCourse) throw new NotFoundException('Curso no encontrado');
     return this.courseRepo.save(updatedCourse);
