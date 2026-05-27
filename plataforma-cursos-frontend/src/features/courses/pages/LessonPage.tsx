@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/app/providers/AuthContext";
 import { type Lesson, lessonService } from "../services/lessonService";
 import { useCourse } from "../hooks/useCourses.hook";
@@ -10,86 +9,70 @@ import LessonForm from "../components/LessonForm";
 import { type LessonFormData } from "../components/LessonForm";
 import LessonList from "../components/LessonList";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
-import { ArrowLeft, Plus, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   examService,
   type Exam,
   type ExamQuestionWithAnswer,
 } from "@/features/exams/services/examService";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useCourseExams } from "../hooks/useCourseExams";
+import { CourseHeader } from "../components/CourseHeader";
+import { ExamsSection } from "../components/ExamsSection";
+import { EmptyLessonsState } from "../components/EmptyLessonsState";
+import { ExamPreviewDialog } from "../components/ExamPreviewDialog";
 
 function LessonPage() {
   const { logout } = useAuth();
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { course } = useCourse(Number(courseId));
-  const { lessons, setLessons, loading } = useLessons(Number(courseId));
+  const numericCourseId = Number(courseId);
+
+  const { course } = useCourse(numericCourseId);
+  const { lessons, setLessons, loading } = useLessons(numericCourseId);
+
+  const { courseExams, deleteExam } = useCourseExams(numericCourseId);
+
   const [showForm, setShowForm] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [formError, setFormError] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [lessonToDelete, setLessonToDelete] = useState<string | null>(null);
-  const [formError, setFormError] = useState("");
-  const [allExams, setAllExams] = useState<Exam[]>([]);
-  const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
-  const [examQuestions, setExamQuestions] = useState<ExamQuestionWithAnswer[]>(
-    [],
-  );
+
   const [showExamModal, setShowExamModal] = useState(false);
   const [confirmDeleteExamOpen, setConfirmDeleteExamOpen] = useState(false);
   const [examToDelete, setExamToDelete] = useState<Exam | null>(null);
 
-  useEffect(() => {
-    examService
-      .getMyExams()
-      .then((data) => {
-        setAllExams(data);
-        if (data.length > 0) {
-          setSelectedExam(data[0]);
-        } else {
-          setSelectedExam(null);
-        }
-      })
-      .catch((err) => console.error("Error cargando exámenes", err));
-  }, []);
+  const [examForModal, setExamForModal] = useState<Exam | null>(null);
+  const [examQuestions, setExamQuestions] = useState<ExamQuestionWithAnswer[]>(
+    [],
+  );
 
   useEffect(() => {
-    if (selectedExam && selectedExam.id && selectedExam.id !== "my") {
+    if (examForModal?.id) {
       examService
-        .getOne(selectedExam.id)
+        .getOne(examForModal.id)
         .then((fullExam) => setExamQuestions(fullExam.questions || []))
         .catch((err) => console.error("Error cargando preguntas", err));
+    } else {
+      setExamQuestions([]);
     }
-  }, [selectedExam]);
+  }, [examForModal]);
 
   const openCreateForm = () => {
     setEditingLesson(null);
     setShowForm(true);
   };
 
-  const openEditForm = (lesson: Lesson) => {
+  const openEditFormLesson = (lesson: Lesson) => {
     setEditingLesson(lesson);
     setShowForm(true);
   };
 
-  const handleSubmit = async (data: LessonFormData) => {
+  const handleSubmitLesson = async (data: LessonFormData) => {
     try {
       if (editingLesson) {
         const updateLesson = await lessonService.update(
-          Number(courseId),
+          numericCourseId,
           editingLesson.id,
           data,
         );
@@ -97,7 +80,7 @@ function LessonPage() {
           lessons.map((l) => (l.id === updateLesson.id ? updateLesson : l)),
         );
       } else {
-        const newLesson = await lessonService.create(Number(courseId), data);
+        const newLesson = await lessonService.create(numericCourseId, data);
         setLessons([...lessons, newLesson]);
       }
 
@@ -111,17 +94,26 @@ function LessonPage() {
     }
   };
 
-  const handleDelete = async (lessonId: string) => {
+  const handleDeleteLesson = async (lessonId: string) => {
     setLessonToDelete(lessonId);
     setConfirmOpen(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmDeleteLesson = async () => {
     if (!lessonToDelete) return;
-    await lessonService.remove(Number(courseId), lessonToDelete);
+    await lessonService.remove(numericCourseId, lessonToDelete);
     setLessons((prev) => prev.filter((l) => l.id !== lessonToDelete));
     setConfirmOpen(false);
     setLessonToDelete(null);
+  };
+
+  const handleViewExam = (exam: Exam) => {
+    setExamForModal(exam);
+    setShowExamModal(true);
+  };
+
+  const handleEditExam = (exam: Exam) => {
+    navigate(`/creator/courses/${courseId}/exam/edit/${exam.id}`);
   };
 
   const handleDeleteExam = (exam: Exam) => {
@@ -132,12 +124,7 @@ function LessonPage() {
   const confirmDeleteExam = async () => {
     if (!examToDelete) return;
     try {
-      await examService.deleteExam(examToDelete.id);
-      const updatedExams = allExams.filter((e) => e.id !== examToDelete.id);
-      setAllExams(updatedExams);
-      if (selectedExam?.id === examToDelete.id) {
-        setSelectedExam(updatedExams.length > 0 ? updatedExams[0] : null);
-      }
+      await deleteExam(examToDelete.id);
     } catch (error) {
       console.error("Error al eliminar examen", error);
       alert("No se pudo eliminar el examen");
@@ -170,98 +157,22 @@ function LessonPage() {
         </nav>
 
         <div className="max-w-4xl mx-auto px-8 py-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-bold">{course?.title}</h2>
-              <p className="text-muted-foreground text-sm">
-                Gestiona las lecciones de este curso
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={openCreateForm} size="sm">
-                <Plus className="mr-1 h-4 w-4" /> Nueva lección
-              </Button>
-              <Button
-                onClick={() =>
-                  navigate(`/creator/courses/${courseId}/exam/new`)
-                }
-                size="sm"
-              >
-                <Plus className="mr-1 h-4 w-4" /> Nuevo examen (este curso)
-              </Button>
-            </div>
-          </div>
-
-          {allExams.length > 0 && (
-            <div className="mb-6 p-4 border rounded-lg bg-muted/20">
-              <h3 className="text-sm font-semibold mb-2">
-                Tus exámenes (todos los cursos)
-              </h3>
-              <div className="flex flex-wrap gap-3 items-center">
-                <Select
-                  value={selectedExam?.id}
-                  onValueChange={(examId) => {
-                    const exam = allExams.find((e) => e.id === examId);
-                    setSelectedExam(exam || null);
-                  }}
-                >
-                  <SelectTrigger className="w-72">
-                    <SelectValue placeholder="Selecciona un examen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allExams.map((exam) => (
-                      <SelectItem key={exam.id} value={exam.id}>
-                        {exam.title} –{" "}
-                        {exam.course?.title || "Curso sin título"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {selectedExam && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowExamModal(true)}
-                    >
-                      <Eye className="mr-1 h-4 w-4" /> Ver examen
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        navigate(
-                          `/creator/courses/${courseId}/exam/edit/${selectedExam.id}`,
-                        )
-                      }
-                    >
-                      Editar examen
-                    </Button>
-
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteExam(selectedExam)}
-                    >
-                      <Trash2 className="mr-1 h-4 w-4" /> Eliminar examen
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {allExams.length === 0 && (
-            <div className="mb-6 p-4 border rounded-lg bg-muted/20 text-center text-muted-foreground">
-              No tienes exámenes creados en ningún curso. Crea uno usando "Nuevo
-              examen (este curso)".
-            </div>
-          )}
+          <CourseHeader
+            courseTitle={course?.title}
+            onNewLesson={openCreateForm}
+            onNewExam={() => navigate(`/creator/courses/${courseId}/exam/new`)}
+          />
+          <ExamsSection
+            exams={courseExams}
+            onViewExam={handleViewExam}
+            onEditExam={handleEditExam}
+            onDeleteExam={handleDeleteExam}
+          />
 
           {showForm && (
             <LessonForm
               editingLesson={editingLesson ?? undefined}
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmitLesson}
               onCancel={() => {
                 setShowForm(false);
                 setFormError("");
@@ -273,97 +184,30 @@ function LessonPage() {
           {loading ? (
             <p className="text-muted-foreground">Cargando...</p>
           ) : lessons.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground mb-4">
-                  No hay lecciones todavía.
-                </p>
-                <Button
-                  onClick={openCreateForm}
-                  className="hover:cursor-pointer"
-                >
-                  Crear primera lección
-                </Button>
-              </CardContent>
-            </Card>
+            <EmptyLessonsState onCreateFirst={openCreateForm} />
           ) : (
             <LessonList
               lessons={lessons}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
+              onEdit={openEditFormLesson}
+              onDelete={handleDeleteLesson}
             />
           )}
         </div>
       </div>
 
-      <Dialog open={showExamModal} onOpenChange={setShowExamModal}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedExam?.title}</DialogTitle>
-            <DialogDescription>
-              Puntaje mínimo: <strong>{selectedExam?.passingScore}%</strong>
-              {selectedExam?.course && (
-                <> – Curso: {selectedExam.course.title}</>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 mt-4">
-            {examQuestions.length === 0 ? (
-              <p className="text-muted-foreground">
-                No hay preguntas en este examen.
-              </p>
-            ) : (
-              examQuestions.map((q, idx) => (
-                <Card key={q.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-base">
-                        {idx + 1}. {q.question}
-                      </h3>
-                      <Badge variant="outline">{q.points} pts</Badge>
-                    </div>
-                    <div className="space-y-1 mt-2">
-                      {q.options.map((opt, optIdx) => (
-                        <div key={optIdx} className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${
-                              q.correctAnswer === optIdx
-                                ? "bg-green-500"
-                                : "bg-muted-foreground"
-                            }`}
-                          />
-                          <span
-                            className={`text-sm ${
-                              q.correctAnswer === optIdx
-                                ? "font-medium text-green-700"
-                                : ""
-                            }`}
-                          >
-                            {opt}
-                          </span>
-                          {q.correctAnswer === optIdx && (
-                            <Badge variant="secondary" className="ml-2 text-xs">
-                              Correcta
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
+      <ExamPreviewDialog
+        open={showExamModal}
+        onOpenChange={setShowExamModal}
+        exam={examForModal}
+        questions={examQuestions}
+      />
       <ConfirmDialog
         open={confirmOpen}
         title="Eliminar lección"
         description="¿Estás seguro de que quieres eliminar esta lección? Esta acción no se puede deshacer."
         confirmLabel="Eliminar"
         variant="destructive"
-        onConfirm={confirmDelete}
+        onConfirm={confirmDeleteLesson}
         onCancel={() => {
           setConfirmOpen(false);
           setLessonToDelete(null);

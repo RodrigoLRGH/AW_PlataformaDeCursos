@@ -215,11 +215,16 @@ export class ExamsService {
     return { message: 'Examen eliminado' };
   }
 
-  async findByCreator(userId: number) {
-    return this.examRepo
+  async findByCreator(userId: number, courseId?: number) {
+    const queryBuilder = this.examRepo
       .createQueryBuilder('exam')
       .leftJoinAndSelect('exam.course', 'course')
-      .where('course.creatorId = :userId', { userId })
-      .getMany();
+      .where('course.creatorId = :userId', { userId });
+
+    if (courseId) {
+      queryBuilder.andWhere('exam.courseId = :courseId', { courseId });
+    }
+
+    return queryBuilder.getMany();
   }
 }

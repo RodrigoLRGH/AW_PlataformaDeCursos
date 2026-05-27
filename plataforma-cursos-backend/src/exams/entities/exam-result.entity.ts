@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn, Index, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Exam } from './exam.entity';
 import { Certificate } from '../../certificates/entities/certificate.entity';
@@ -32,7 +41,6 @@ export class ExamResult {
   @CreateDateColumn({ name: 'submitted_at' })
   submittedAt: Date;
 
-  // Relaciones
   @ManyToOne(() => User, (user) => user.examResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;

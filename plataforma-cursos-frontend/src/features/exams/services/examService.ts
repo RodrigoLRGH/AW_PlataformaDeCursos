@@ -87,8 +87,9 @@ export const examService = {
     return response.data;
   },
 
-  getMyExams: async () => {
-    const response = await api.get(`/exams/my`);
+  getMyExams: async (courseId?: number) => {
+    const url = courseId ? `/exams/my?courseId=${courseId}` : `/exams/my`;
+    const response = await api.get(`${url}`);
     return response.data;
   },
 

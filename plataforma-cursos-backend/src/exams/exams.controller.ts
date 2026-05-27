@@ -10,6 +10,7 @@
   Put,
   UseInterceptors,
   Delete,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -38,8 +39,8 @@ export class ExamsController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.CREATOR)
   @ApiOperation({ summary: 'Listar todos los exámenes del creador' })
-  async getMyExams(@Request() req) {
-    return this.examsService.findByCreator(req.user.sub);
+  async getMyExams(@Request() req, @Query('courseId') courseId?: number) {
+    return this.examsService.findByCreator(req.user.sub, courseId);
   }
 
   @Post('courses/:courseId')
