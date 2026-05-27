@@ -36,30 +36,6 @@ Aplicación web para la creación y consumo de cursos en línea. Los creadores p
 - PostgreSQL 14+
 - npm 9+
 
-## Variables de entorno
-
-### Backend: `plataforma-cursos-backend/.env`
-
-```env
-# Base de datos
-DB_URL=postgresql://postgres:tu_contraseña@localhost:5432/plataforma_cursos
-
-# JWT
-JWT_ACCESS_SECRET=tu_access_secret
-JWT_REFRESH_SECRET=tu_refresh_secret
-
-# App
-PORT=3000
-CORS_ORIGIN=http://localhost:5173
-NODE_ENV=development
-```
-
-### Frontend: `plataforma-cursos-frontend/.env`
-
-```env
-VITE_API_URL=http://localhost:3000
-```
-
 ## Instalación y configuración
 
 ### 1. Clonar el repositorio
@@ -82,7 +58,7 @@ cp .env.example .env
 
 ```bash
 # En PostgreSQL crea la base de datos
-psql -U postgres -c "CREATE DATABASE cursos_db;"
+psql -U postgres -c "CREATE DATABASE plataforma_cursos;"
 ```
 
 > Con `synchronize: true` en TypeORM, las tablas se crean automáticamente al levantar el backend.
