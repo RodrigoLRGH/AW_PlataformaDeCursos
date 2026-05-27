@@ -65,7 +65,7 @@ VITE_API_URL=http://localhost:3000
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/plataforma-cursos.git
+git clone https://github.com/RodrigoLRGH/AW_PlataformaDeCursos.git
 cd plataforma-cursos
 ```
 
