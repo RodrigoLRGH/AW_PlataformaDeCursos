@@ -1,21 +1,15 @@
 # Plataforma de Cursos
-
 **Materia:** Aplicaciones Web
-
 **Grupo:** ISyTE G-961 2026
-
 **Equipo:**
-
 - Lira Palafox
 - López Rojas
 - Mar Garcia
 
 ## Descripción
-
 Aplicación web para la creación y consumo de cursos en línea. Los creadores pueden diseñar cursos con lecciones y exámenes, mientras los estudiantes pueden inscribirse, seguir su progreso, obtener certificados y participar en foros.
 
 ## Tecnologías utilizadas
-
 ### Frontend
 - React 18 + Vite + TypeScript
 - Tailwind CSS + shadcn/ui
@@ -31,75 +25,60 @@ Aplicación web para la creación y consumo de cursos en línea. Los creadores p
 - PDFKit
 
 ## Requisitos previos
-
 - Node.js 18+
-- PostgreSQL 14+
+- PostgreSQL 18
 - npm 9+
 
 ## Instalación y configuración
 
 ### 1. Clonar el repositorio
-
 ```bash
 git clone https://github.com/RodrigoLRGH/AW_PlataformaDeCursos.git
-cd plataforma-cursos
+cd AW_PlataformaDeCursos
 ```
 
-### 2. Configurar el backend
+### 2. Crear la base de datos
+> Los archivos `.env` ya están incluidos en el repositorio con la configuración por defecto.
+> Asegúrate de tener PostgreSQL corriendo con usuario `postgres` y contraseña `postgres`. De no ser el caso, modifica el archivo ingresando tu usuario y contraseña.
 
 ```bash
-cd plataforma-cursos-backend
-npm install
-cp .env.example .env
-# Edita .env con tus credenciales de PostgreSQL y secretos JWT
-```
-
-### 3. Crear la base de datos
-
-```bash
-# En PostgreSQL crea la base de datos
-psql -U postgres -c "CREATE DATABASE plataforma_cursos;"
+# Windows (CMD)
+"C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -c "CREATE DATABASE plataforma_cursos;"
 ```
 
 > Con `synchronize: true` en TypeORM, las tablas se crean automáticamente al levantar el backend.
 
-### 4. Configurar el frontend
+### 3. Instalar dependencias del backend
+```bash
+cd plataforma-cursos-backend
+npm install
+```
 
+### 4. Instalar dependencias del frontend
 ```bash
 cd ../plataforma-cursos-frontend
 npm install
-cp .env.example .env
-# Edita VITE_API_URL si el backend corre en otro puerto
 ```
 
 ## Correr el proyecto
 
 ### Backend
-
 ```bash
 cd plataforma-cursos-backend
 npm run start
 ```
-
 El servidor corre en `http://localhost:3000`
 Swagger disponible en `http://localhost:3000/api/docs`
 
 ### Frontend
-
 ```bash
 cd plataforma-cursos-frontend
 npm run dev
 ```
-
 La app corre en `http://localhost:5173`
 
-## Funcionalidades
-
 ## Roles del sistema
-
 | Rol | Permisos |
 |-----|----------|
 | `student` | Inscribirse a cursos, ver lecciones, tomar exámenes, obtener certificados, participar en foros |
 | `creator` | Crear/editar/eliminar sus cursos, gestionar lecciones, gestionar exámenes |
-
----
