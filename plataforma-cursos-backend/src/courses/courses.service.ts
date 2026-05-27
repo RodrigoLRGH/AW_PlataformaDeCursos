@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Course, CourseStatus } from './entities/course.entity';
@@ -14,7 +10,8 @@ export class CoursesService {
   constructor(
     @InjectRepository(Course)
     private readonly courseRepo: Repository<Course>,
-  ) {}
+  ) { }
+
 
   async findAll(isPublished?: boolean) {
     const where: { status?: CourseStatus } = {};
@@ -45,11 +42,12 @@ export class CoursesService {
     return this.courseRepo.save(course);
   }
 
+  
   async update(id: number, dto: UpdateCourseDto, userId: number) {
     const course = await this.findOne(id);
 
     if (Number(course.creatorId) !== Number(userId)) {
-      throw new ForbiddenException('No autorizado para eliminar este curso');
+      throw new ForbiddenException('No autorizado para eliminar este curso')
     }
 
     const updatedCourse = await this.courseRepo.preload({ id, ...dto });
@@ -61,7 +59,7 @@ export class CoursesService {
     const course = await this.findOne(id);
 
     if (Number(course.creatorId) !== Number(userId)) {
-      throw new ForbiddenException('No autorizado para eliminar este curso');
+      throw new ForbiddenException('No autorizado para eliminar este curso')
     }
     await this.courseRepo.remove(course);
     return { message: 'Curso eliminado' };

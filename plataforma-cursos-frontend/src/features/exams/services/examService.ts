@@ -14,11 +14,7 @@ export interface Exam {
   courseId: string;
   passingScore: number;
   timeLimitMinutes?: number;
-  questions?: ExamQuestion[] | ExamQuestionWithAnswer[];
-  course?: {
-    id: number;
-    title: string;
-  };
+  questions?: ExamQuestion[];
 }
 
 export interface ExamResult {
@@ -45,10 +41,6 @@ export interface CreateExamPayload {
 
 export interface SubmitExamPayload {
   answers: { questionId: string; selectedOption: number }[];
-}
-
-export interface ExamQuestionWithAnswer extends ExamQuestion {
-  correctAnswer: number;
 }
 
 export const examService = {

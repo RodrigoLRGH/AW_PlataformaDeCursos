@@ -47,11 +47,11 @@ function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/40">
-            <Card className="w-full max-w-md shadow-lg">
+        <div className="min-h-screen flex items-center justify-center bg-fondo">
+            <Card className="w-full max-w-md shadow-lg bg-fondo-claro">
                 <CardHeader className="text-center">
-                    <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-                    <CardDescription>Completa el formulario para registrarte</CardDescription>
+                    <CardTitle className="text-2xl text-primario">Crear cuenta</CardTitle>
+                    <CardDescription className="text-secundario">Completa el formulario para registrarte</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -99,9 +99,9 @@ function RegisterPage() {
                             {isSubmitting ? 'Registrando...' : 'Registrarse'}
                         </Button>
                     </form>
-                    <p className="text-center text-sm mt-4 text-muted-foreground">
+                    <p className="text-center text-sm mt-4 text-secundario">
                         ¿Ya tienes cuenta?{' '}
-                        <Link to="/login" className="text-primary hover:underline">Inicia sesión</Link>
+                        <Link to="/login" className="text-primario hover:underline">Inicia sesión</Link>
                     </p>
                 </CardContent>
             </Card>

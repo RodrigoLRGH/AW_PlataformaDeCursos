@@ -32,10 +32,17 @@ function CreatorDashboard() {
 
   return (
     <>
-      <div className="min-h-screen bg-muted/40">
-        <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-primary">Panel del creador</h1>
+      <div className="min-h-screen bg-fondo">
+        <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-primario">Panel del creador</h1>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              {isDark ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             <CircleUser />
             <span className="text-sm text-muted-foreground">
               {user?.firstName} {user?.lastName}
@@ -67,7 +74,7 @@ function CreatorDashboard() {
             </Button>
           </div>
           {loading ? (
-            <p className="text-muted-foreground">Cargando...</p>
+            <p className="text-secundario">Cargando...</p>
           ) : courses.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
@@ -135,6 +142,13 @@ function CreatorDashboard() {
                         onClick={() => handleDelete(course.id)}
                       >
                         <Trash2 className="mr-1 h-2 w-4" /> Eliminar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(course.id)}
+                      >
+                        Eliminar
                       </Button>
                     </div>
                   </CardHeader>

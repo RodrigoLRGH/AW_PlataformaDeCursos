@@ -11,14 +11,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/app/providers/AuthContext';
 import { ArrowLeft, X } from 'lucide-react';
-
+import { useTheme } from '@/hooks/useTheme'
+import { Sun, Moon } from 'lucide-react'
 
 const schema = z.object({
-    title: z.string().min(3, 'Minimo 3 caracteres'),
-    description: z.string().optional(),
+    title: z.string().min(3, 'Minimo 3 caracteres').max(70, 'Maximo 70 caracteres'),
+    description: z.string().max(90, 'Maximo 90 caracteres').optional(),
     thumbnailUrl: z.string().url('URL invalida').optional().or(z.literal('')),
     price: z.number().min(0, 'El precio no puede ser negativo'),
-    category: z.string().optional(),
+    category: z.string().max(25, 'Maximo 25 caracteres').optional(),
     level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
 });
 
@@ -30,6 +31,7 @@ export function CreateCoursePage() {
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, setError } = useForm<CreateCourseFormData>({
         resolver: zodResolver(schema),
     });
+    const { isDark, toggleTheme } = useTheme()
 
     const onSubmit = async (data: CreateCourseFormData) => {
         try {
@@ -42,30 +44,39 @@ export function CreateCoursePage() {
 
     return (
         <>
-            <div className="min-h-screen bg-muted/40">
-                <nav className="bg-background shadow px-8 py-4 flex justify-between items-center">
-                    <Button size="sm" onClick={() => navigate('/creator-dashboard')} className="hover:cursor-pointer">
-                        <ArrowLeft size={16} /> Volver
-                    </Button>
-                    <h1 className="text-xl font-bold text-primary">Nuevo curso</h1>
-                    <Button variant="destructive" size="sm" onClick={logout} className="hover:cursor-pointer">
-                        Cerrar sesión
-                    </Button>
+            <div className="min-h-screen bg-fondo">
+                <nav className="bg-fondo-claro shadow px-8 py-4 flex justify-between items-center">
+                    <div className="flex flex-1">
+                        <Button size="sm" onClick={() => navigate('/creator-dashboard')}>
+                            <ArrowLeft size={16} /> Volver
+                        </Button>
+                    </div>
+
+                    <h1 className="text-xl font-bold text-primario">Nuevo curso</h1>
+
+                    <div className="flex flex-1 justify-end items-center gap-2">
+                        <Button variant="ghost" size="icon" onClick={toggleTheme}>
+                            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={logout}>
+                            Cerrar sesion
+                        </Button>
+                    </div>
                 </nav>
                 <div className="max-w-2xl mx-auto px-8 py-10">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Información del curso</CardTitle>
+                            <CardTitle>Informacion del curso</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <div className="space-y-1">
-                                    <Label htmlFor="title">Título</Label>
+                                    <Label htmlFor="title">Titulo</Label>
                                     <Input id="title" placeholder="Nombre del curso" {...register('title')} />
                                     {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="description">Descripción</Label>
+                                    <Label htmlFor="description">Descripcion</Label>
                                     <Textarea id="description" rows={4} placeholder="Describe tu curso..." {...register('description')} />
                                 </div>
                                 <div className="space-y-1">
@@ -98,11 +109,11 @@ export function CreateCoursePage() {
                                     {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
                                 </div>
                                 <div className="flex gap-3 pt-2">
-                                    <Button type="button" variant="outline" className="flex-1 hover:cursor-pointer"
+                                    <Button type="button" variant="outline" className="flex-1"
                                         onClick={() => navigate('/creator-dashboard')}>
                                         <X size={16} /> Cancelar
                                     </Button>
-                                    <Button type="submit" className="flex-1 hover:cursor-pointer" disabled={isSubmitting} >
+                                    <Button type="submit" className="flex-1" disabled={isSubmitting} >
                                         {isSubmitting ? 'Guardando...' : 'Crear curso'}
                                     </Button>
                                 </div>

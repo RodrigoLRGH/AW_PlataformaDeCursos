@@ -92,7 +92,6 @@ function LessonPage() {
         error.response?.data?.message || "Error al guardar la lección",
       );
     }
-  };
 
   const handleDeleteLesson = async (lessonId: string) => {
     setLessonToDelete(lessonId);
@@ -214,20 +213,82 @@ function LessonPage() {
         }}
       />
 
-      <ConfirmDialog
-        open={confirmDeleteExamOpen}
-        title="Eliminar examen"
-        description={`¿Estás seguro de que quieres eliminar el examen "${examToDelete?.title}"? Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
-        variant="destructive"
-        onConfirm={confirmDeleteExam}
-        onCancel={() => {
-          setConfirmDeleteExamOpen(false);
-          setExamToDelete(null);
-        }}
-      />
-    </>
-  );
+                    {loading ? (
+                        <p className="text-secundario">
+                            Cargando...
+                        </p>
+
+                    ) : lessons.length === 0 ? (
+                        <Card>
+                            <CardContent className="py-12 text-center">
+                                <p className="text-secundario mb-4">No hay lecciones todavia.</p>
+                                <Button onClick={openCreateForm} >
+                                    Crear primera leccion
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <LessonList
+                            lessons={lessons}
+                            onEdit={openEditForm}
+                            onDelete={handleDelete}
+                        />
+                    )}
+                    <div className="mt-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Exámenes ({exams.length})</h3>
+                            <Button onClick={() => navigate(`/creator/courses/${courseId}/exam/new`)}>
+                                <Plus /> Nuevo examen
+                            </Button>
+                        </div>
+                        {exams.length === 0 ? (
+                            <Card>
+                                <CardContent className="py-12 text-center">
+                                    <p className="text-secundario">No hay examenes creados en este curso.</p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="space-y-2">
+                                {exams.map((exam: Exam) => (
+                                    <div key={exam.id} className="flex items-center justify-between p-3 rounded-lg border">
+                                        <p className="font-medium">{exam.title}</p>
+                                        <Badge variant="outline">{exam.passingScore}% minimo</Badge>
+                                        <Button size="sm" variant="destructive" onClick={() => handleDeleteExam(exam.id)}>
+                                            Eliminar
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Eliminar leccion"
+                description="¿Estas seguro de eliminar esta leccion?"
+                confirmLabel="Eliminar"
+                variant="destructive"
+                onConfirm={confirmDelete}
+                onCancel={() => {
+                    setConfirmOpen(false)
+                    setLessonToDelete(null)
+                }}
+            />
+            <ConfirmDialog  
+                open={confirmExamOpen}
+                title="Eliminar examen"
+                description="¿Estas seguro de eliminar este examen?"
+                confirmLabel="Eliminar"
+                variant="destructive"
+                onConfirm={confirmDeleteExam}
+                onCancel={() => {
+                    setConfirmExamOpen(false)
+                    setExamToDelete(null)
+                }}
+            />
+        </>
+    )
 }
 
 export default LessonPage;
