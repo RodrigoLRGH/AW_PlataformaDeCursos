@@ -1,12 +1,19 @@
-import { createContext, useState, useEffect, type ReactNode, useContext } from 'react';
-import { authService } from '@/features/auth/services/authService';
+import {
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode,
+  useContext,
+} from "react";
+import { authService } from "@/features/auth/services/authService";
+import api from "@/shared/utils/axiosInstance";
 
 interface User {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
-  role: 'student' | 'creator';
+  role: "student" | "creator";
 }
 
 interface AuthContextType {
@@ -24,27 +31,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    authService.me()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setIsLoading(false));
+    const initializaAuth = async () => {
+      try {
+        await api.post("/auth/refresh");
+        const userData = await authService.me();
+        setUser(userData);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initializaAuth();
   }, []);
 
   const login = (user: User) => {
     setUser(user);
-
   };
 
   const logout = async () => {
     try {
-      await authService.logout()
-    } catch {
-    }
-    setUser(null)
-  }
+      await authService.logout();
+    } catch {}
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, isAuthenticated: !!user, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -52,6 +67,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }

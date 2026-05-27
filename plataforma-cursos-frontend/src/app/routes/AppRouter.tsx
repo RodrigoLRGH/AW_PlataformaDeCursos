@@ -101,7 +101,7 @@ function AppRouter() {
           }
         />
         <Route
-          path="/courses/:courseId/lessons"
+          path="/courses/:courseId/lessons/:lessonId"
           element={
             <ProtectedRoute allowedRoles={["student"]}>
               <LessonDetailPage />
