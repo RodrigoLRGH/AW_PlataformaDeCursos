@@ -34,7 +34,6 @@ export function ExamPreviewDialog({
           <DialogTitle>{exam.title}</DialogTitle>
           <DialogDescription>
             Puntaje mínimo: <strong>{exam.passingScore}%</strong>
-            {exam.course && <> – Curso: {exam.course.title}</>}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6 mt-4">

@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useMyCourses } from "@/features/courses/hooks/useCourses.hook";
-import { CircleUser, Plus } from "lucide-react";
+import { CircleUser, Moon, Plus, Sun } from "lucide-react";
 import { useState } from "react";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
 import { Edit, Eye, Trash2 } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 
 function CreatorDashboard() {
   const { user, logout } = useAuth();
@@ -16,6 +17,14 @@ function CreatorDashboard() {
   const { courses, setCourses, loading } = useMyCourses();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
+  const { isDark, toggleTheme } = useTheme();
+
+  const getDisplayName = () => {
+    const first = user?.firstName?.trim() || "";
+    const last = user?.lastName?.trim() || "";
+    if (!first && !last) return "Usuario";
+    return `${first} ${last}`.trim();
+  };
 
   const handleDelete = async (id: number) => {
     setCourseToDelete(id);
@@ -45,7 +54,7 @@ function CreatorDashboard() {
             </Button>
             <CircleUser />
             <span className="text-sm text-muted-foreground">
-              {user?.firstName} {user?.lastName}
+              {getDisplayName()}
             </span>
             <Button
               variant="destructive"
@@ -142,13 +151,6 @@ function CreatorDashboard() {
                         onClick={() => handleDelete(course.id)}
                       >
                         <Trash2 className="mr-1 h-2 w-4" /> Eliminar
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(course.id)}
-                      >
-                        Eliminar
                       </Button>
                     </div>
                   </CardHeader>

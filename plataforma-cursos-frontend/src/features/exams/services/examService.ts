@@ -8,6 +8,10 @@ export interface ExamQuestion {
   points: number;
 }
 
+export interface ExamQuestionWithAnswer extends ExamQuestion {
+  correctAnswer: number;
+}
+
 export interface Exam {
   id: string;
   title: string;

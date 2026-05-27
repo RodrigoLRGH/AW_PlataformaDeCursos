@@ -14,7 +14,6 @@ import { ProgressModule } from './progress/progress.module';
 import { ExamsModule } from './exams/exams.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { ForumsModule } from './forums/forums.module';
-import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -41,7 +40,6 @@ import { HealthModule } from './health/health.module';
     ExamsModule,
     CertificatesModule,
     ForumsModule,
-    HealthModule,
   ],
   providers: [
     {
